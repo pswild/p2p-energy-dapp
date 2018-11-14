@@ -1,6 +1,33 @@
-pragma solidity ^0.4.24;
+ pragma solidity ^0.4.24;
 
 contract Auction {
-  // Community of ten agents
-  address[10] public agents;
+
+  /**************
+   * Structures *
+   **************/
+
+  /*********************
+   * Storage Variables *
+   *********************/
+
+  /* Static */
+
+  //
+
+  /* State */
+
+  //
+
+  /*************
+   * Functions *
+   *************/
+
+  // Place bid
+  function placeBid() returns (bool success) {}
+
+  // Withdraw funds
+  function withdraw() returns (bool success) {}
+
+
+
 }
