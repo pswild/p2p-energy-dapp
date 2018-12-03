@@ -15,7 +15,7 @@ class Profile extends Component {
             <p>Change these details in UPort to see them reflected here.</p>
             <p>
               <strong>Name</strong><br />
-              {this.props.authData.name}
+              {this.props.authData.name}<br />
             </p>
           </div>
         </div>
