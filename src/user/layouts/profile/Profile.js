@@ -12,10 +12,16 @@ class Profile extends Component {
         <div className="pure-g">
           <div className="pure-u-1-1">
             <h1>Profile</h1>
-            <p>Change these details in UPort to see them reflected here.</p>
+            <p>Change these details in your uPort mobile app to see them reflected here.</p>
             <p>
               <strong>Name</strong><br />
               {this.props.authData.name}<br />
+              <strong>Email</strong><br />
+              {this.props.authData.email}<br />
+              <strong>Phone</strong><br />
+              {this.props.authData.phone}<br />
+              <strong>Location</strong><br />
+              {this.props.authData.country}<br />
             </p>
           </div>
         </div>

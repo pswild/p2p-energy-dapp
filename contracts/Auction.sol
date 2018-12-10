@@ -34,12 +34,16 @@ contract Auction {
   function bid(uint value) public returns (uint) {
     // Bid must be between the buyback rate and grid price
     require(buybackRate < value && value < utilityPrice);
-
     // Place bid
     bids[msg.sender] = value;
-
-    // Return value
+    // Return bid value
     return value;
+  }
+
+  // View bid
+  function get() public view returns (uint) {
+    // Return bid for this member
+    return bids[msg.sender];
   }
 
   // Withdraw funds
