@@ -12,7 +12,7 @@ class Home extends Component {
             <h3>An Ethereum Distributed Application</h3>
             <p>Our system allows you to safely trade electricity with members of your micro-grid community without trusting a utility with your data. The price of electricity is set by an auction mechanism, not a central authority. The details of the auction are kept in a distributed ledger that is shared with each participant, but your consumption data and price preferences are visible only to you.</p>
             <h3>uPort Authentication</h3>
-            <p>Set up your secure account with uPort authentication on your mobile device. Click the login button in the upper-right corner.</p>
+            <p>Set up your secure account with <a href="https://www.uport.me" target="_blank">uPort</a> authentication on your mobile device. Click the login button in the upper-right corner.</p>
             <h2>Background</h2>
             <p>The infrastructure for the generation and distribution of electricity the United States relies primarily on environmentally harmful, carbon-based power plants that are controlled by a natural oligopoly of utility providers. The system is highly centralized, requires transmission over long distances, and is liable to disruption by natural disaster.</p>
             <p> As renewable energy and storage device technology improves, localized production of energy will increase grid efficiency, decrease environmental impact, and create a more resilient energy system. The growing electric vehicle market predicts not only an increased demand for electricity, but also the creation of a battery fleet capable of load-balancing intermittent renewable sources.</p>

@@ -11,8 +11,8 @@ function userLoggedIn(user) {
 
 export function loginUser() {
   return function(dispatch) {
-    // UPort and its web3 instance are defined in ./../../../util/wrappers.
-    // Request uPort persona of account passed via QR
+    // UPort and its web3 instance are defined in ./../../../util/connectors.
+    // Request uPort persona of account passed via QR.
     uport.requestCredentials({
       requested: ['name', 'phone', 'country', 'email'],
       notifications: true

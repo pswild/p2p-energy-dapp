@@ -1,6 +1,6 @@
 import { Connect, SimpleSigner } from 'uport-connect'
 
-// Connect to the uPort application. 
+// Connect to the uPort application.
 export let uport = new Connect('Peer-To-Peer Energy Trading', {
   clientId: '2oqQV3BHyHrfVkQRVY2XDgrb2XCAXPZkjxm',
   network: 'rinkeby',
