@@ -8,15 +8,15 @@ import TestButtonContainer from './ui/testbutton/TestButtonContainer'
 // import Button from 'react-bootstrap/Button'
 
 // <Card className="text-center">
-//   <Card.Header>Featured</Card.Header>
+//   <Card.Header>Auction</Card.Header>
 //   <Card.Body>
-//     <Card.Title>Special title treatment</Card.Title>
+//     <Card.Title>Welcome to the auction!</Card.Title>
 //     <Card.Text>
-//       With supporting text below as a natural lead-in to additional content.
+//       Here you can buy and sell electricity with other members of your microgrid community.
 //     </Card.Text>
-//     <Button variant="primary">Go somewhere</Button>
+//     <Button variant="primary">Link to auction information.</Button>
 //   </Card.Body>
-//   <Card.Footer className="text-muted">2 days ago</Card.Footer>
+//   <Card.Footer className="text-muted">For more information, visit our GitHub.</Card.Footer>
 // </Card>
 
 // D3 JavaScript Visualization.
@@ -98,7 +98,7 @@ class Dashboard extends Component {
 
             <h2>Auction</h2>
             <p>Specify your auction preferences here.</p>
-            <h3>Insert "AuctionPanel"</h3>
+
 
             <h2>Statistics</h2>
             <h3>Energy Usage</h3>
