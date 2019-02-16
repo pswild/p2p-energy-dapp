@@ -2,24 +2,31 @@ import React, { Component } from 'react'
 
 // UI Components
 import TestButtonContainer from './testbutton/TestButtonContainer'
-
 // Load usage data.
 import data from './data.csv';
-
 // ReactD3.
 import * as ReactD3 from 'react-d3';
-
 // D3.
 import * as d3 from "d3";
+
+// Auction data.
+var current = new Date();
+var currentYear = current.getFullYear();
+var currentMonth = current.getMonth() + 1;
+var currentDay = current.getDate();
+var currentHour = current.getHours();
+var currentMinute = current.getMinutes();
+var currentSecond = current.getSeconds();
+
+console.log(current);
+
+var nextAuction;
 
 // Energy usage data.
 var usage;
 
 // Parse CSV file.
 d3.csv(data).then(function(data) {
-  // Log CSV to console.
-  // console.log(data);
-
   // CSV format.
   // ["Account", "SPID", "MID", "Time", "Channel", "kWh"]
 
@@ -61,8 +68,8 @@ d3.csv(data).then(function(data) {
 
 class Dashboard extends Component {
   constructor(props, { authData }) {
-    super(props)
-    authData = this.props
+    super(props);
+    authData = this.props;
   }
 
   render() {
