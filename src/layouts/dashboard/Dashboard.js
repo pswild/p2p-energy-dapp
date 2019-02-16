@@ -34,8 +34,6 @@ var currentDay = current.getDate();
 var currentHour = current.getHours();
 var currentMinute = current.getMinutes();
 var currentSecond = current.getSeconds();
-// Log to console.
-console.log(current);
 // Auction period: [year, month, day, hour].
 var nextAuction = [currentYear, currentMonth, currentDay, currentHour];
 
@@ -50,25 +48,25 @@ D3.csv(data).then(function(data) {
   // Read each line of CSV.
   for (var i = 0; i < data.length; i++) {
     // Create new date.
-    var time = data[i].Time.split(" ");
+    var csvTime = data[i].Time.split(" ");
 
-    var calendar = time[0].split("/");
-    var period = time[1].split(":");
-    var ampm = time[2];
+    var calendar = csvTime[0].split("/");
+    var period = csvTime[1].split(":");
+    var ampm = csvTime[2];
 
-    var year = calendar[2];
+    var year = "20" + calendar[2];
     var month = calendar[0];
     var day = calendar[1];
-
-    var date = new Date(year, month, day);
 
     var hour = parseInt(period[0], 10);
     if (ampm === "PM") {
       hour += 12;
     }
 
+    var date = new Date(year, month, day, hour);
+
     // Add data point.
-    values.push({x: i, y: data[i].kWh});
+    values.push({x: date, y: data[i].kWh});
   }
 
   // Update graph.
