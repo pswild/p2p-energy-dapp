@@ -1,15 +1,32 @@
 import React, { Component } from 'react'
 
 // UI Components
-import TestButtonContainer from './testbutton/TestButtonContainer'
-// Load usage data.
-import data from './data.csv';
-// ReactD3.
-import * as ReactD3 from 'react-d3';
-// D3.
-import * as d3 from "d3";
+import TestButtonContainer from './ui/testbutton/TestButtonContainer'
 
-// Auction data.
+// Load Bootstrap components individually.
+// import Card from 'react-bootstrap/Card'
+// import Button from 'react-bootstrap/Button'
+
+// <Card className="text-center">
+//   <Card.Header>Featured</Card.Header>
+//   <Card.Body>
+//     <Card.Title>Special title treatment</Card.Title>
+//     <Card.Text>
+//       With supporting text below as a natural lead-in to additional content.
+//     </Card.Text>
+//     <Button variant="primary">Go somewhere</Button>
+//   </Card.Body>
+//   <Card.Footer className="text-muted">2 days ago</Card.Footer>
+// </Card>
+
+// D3 JavaScript Visualization.
+import * as D3 from "d3"
+import * as ReactD3 from 'react-d3'
+
+// Load usage data.
+import data from './data/jan18_jan19.csv'
+
+// Current date and time.
 var current = new Date();
 var currentYear = current.getFullYear();
 var currentMonth = current.getMonth() + 1;
@@ -17,22 +34,19 @@ var currentDay = current.getDate();
 var currentHour = current.getHours();
 var currentMinute = current.getMinutes();
 var currentSecond = current.getSeconds();
-
+// Log to console.
 console.log(current);
-
-var nextAuction;
+// Auction period: [year, month, day, hour].
+var nextAuction = [currentYear, currentMonth, currentDay, currentHour];
 
 // Energy usage data.
-var usage;
-
+var usage = [];
 // Parse CSV file.
-d3.csv(data).then(function(data) {
-  // CSV format.
-  // ["Account", "SPID", "MID", "Time", "Channel", "kWh"]
+D3.csv(data).then(function(data) {
+  // CSV format: ["Account", "SPID", "MID", "Time", "Channel", "kWh"].
 
   // Values.
   var values = [];
-
   // Read each line of CSV.
   for (var i = 0; i < data.length; i++) {
     // Create new date.
@@ -77,11 +91,15 @@ class Dashboard extends Component {
       <main className="container">
         <div className="pure-g">
           <div className="pure-u-1-1">
+
             <h1>Dashboard</h1>
             <p><strong>Congratulations, {this.props.authData.name}!</strong></p>
             <p>If you're seeing this page, you've logged in with uPort successfully. Navigate to your profile for more information.</p>
+
             <h2>Auction</h2>
             <p>Specify your auction preferences here.</p>
+            <h3>Insert "AuctionPanel"</h3>
+
             <h2>Statistics</h2>
             <h3>Energy Usage</h3>
             <p>Display energy usage graph here.</p>
@@ -97,8 +115,10 @@ class Dashboard extends Component {
             <p>Display energy production graph here.</p>
             <h3>Storage Capacity</h3>
             <p>Display storage capacity here.</p>
+
             <h2>Component Testing</h2>
             <TestButtonContainer />
+
           </div>
         </div>
       </main>
