@@ -13,6 +13,7 @@ class Profile extends Component {
           <div className="pure-u-1-1">
             <h1>Profile</h1>
             <p>Change these details in your uPort mobile app to see them reflected here.</p>
+            <h2>Contact Information</h2>
             <p>
               <strong>Name</strong><br />
               {this.props.authData.name}<br />
@@ -23,6 +24,10 @@ class Profile extends Component {
               <strong>Location</strong><br />
               {this.props.authData.country}<br />
             </p>
+            <h2>Ethereum Account</h2>
+            <p>Display current Ether balance here.</p>
+            <h2>Grid Statistics</h2>
+            <p>Diplay information about the microgrid here. Use Google Maps React for visualization of the microgrid.</p>
           </div>
         </div>
       </main>

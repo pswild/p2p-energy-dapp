@@ -7,37 +7,57 @@ import TestButtonContainer from './testbutton/TestButtonContainer'
 import data from './data.csv';
 
 // ReactD3.
-import { AreaChart } from 'react-d3';
+import * as ReactD3 from 'react-d3';
 
 // D3.
 import * as d3 from "d3";
-// import { csv } from 'd3-fetch';
-// import { parse } from 'd3-dsv';
+
+// Energy usage data.
+var usage;
 
 // Parse CSV file.
-d3.csv(data, function(d) {
+d3.csv(data).then(function(data) {
   // Log CSV to console.
-  console.log(data);
+  // console.log(data);
 
-  // Format the given array of objects as CSV.
-  // var string = d3.csvFormat(d, ["Account", "SPID", "MID", "Time", "Channel", "kWh"]);
+  // CSV format.
+  // ["Account", "SPID", "MID", "Time", "Channel", "kWh"]
 
-  // for (var i = 0; i < arr.length; i++) {
-  // console.log(arr[i].Time);
-  // console.log(arr[i].kWh);
-  // }
-});
+  // Values.
+  var values = [];
 
-var example = [
-  {
-    label: 'somethingA',
-    values: [{x: 0, y: 2}, {x: 1.3, y: 5}, {x: 3, y: 6}, {x: 3.5, y: 6.5}, {x: 4, y: 6}, {x: 4.5, y: 6}, {x: 5, y: 7}, {x: 5.5, y: 8}]
-  },
-  {
-    label: 'somethingB',
-    values: [{x: 0, y: 3}, {x: 1.3, y: 4}, {x: 3, y: 7}, {x: 3.5, y: 8}, {x: 4, y: 7}, {x: 4.5, y: 7}, {x: 5, y: 7.8}, {x: 5.5, y: 9}]
+  // Read each line of CSV.
+  for (var i = 0; i < data.length; i++) {
+    // Create new date.
+    var time = data[i].Time.split(" ");
+
+    var calendar = time[0].split("/");
+    var period = time[1].split(":");
+    var ampm = time[2];
+
+    var year = calendar[2];
+    var month = calendar[0];
+    var day = calendar[1];
+
+    var date = new Date(year, month, day);
+
+    var hour = parseInt(period[0], 10);
+    if (ampm === "PM") {
+      hour += 12;
+    }
+
+    // Add data point.
+    values.push({x: i, y: data[i].kWh});
   }
-];
+
+  // Update graph.
+  usage = [
+    {
+      label: 'Energy Usage',
+      values: values
+    }
+  ];
+});
 
 class Dashboard extends Component {
   constructor(props, { authData }) {
@@ -53,14 +73,24 @@ class Dashboard extends Component {
             <h1>Dashboard</h1>
             <p><strong>Congratulations, {this.props.authData.name}!</strong></p>
             <p>If you're seeing this page, you've logged in with uPort successfully. Navigate to your profile for more information.</p>
-            <h2>Energy Usage Visualization</h2>
-            <AreaChart
-              data={example}
-              width={400}
+            <h2>Auction</h2>
+            <p>Specify your auction preferences here.</p>
+            <h2>Statistics</h2>
+            <h3>Energy Usage</h3>
+            <p>Display energy usage graph here.</p>
+            <ReactD3.AreaChart
+              data={usage}
+              width={1400}
               height={400}
               yOrientation='right'
-              margin={{top: 10, bottom: 50, left: 50, right: 10}}/>
-            <h2>Test</h2>
+              margin={{top: 10, bottom: 50, left: 50, right: 10}}
+              xAxis={{label: "Time"}}
+              yAxis={{label: "kWh"}}/>
+            <h3>Energy Production</h3>
+            <p>Display energy production graph here.</p>
+            <h3>Storage Capacity</h3>
+            <p>Display storage capacity here.</p>
+            <h2>Component Testing</h2>
             <TestButtonContainer />
           </div>
         </div>
