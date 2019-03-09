@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */ // Avoid the linter considering truffle elements as undef.
-const Auction = artifacts.require('Auction.sol')
+const Auction1B1P = artifacts.require('Auction1B1P.sol')
 const { expectThrow, increaseTime } = require('./helpers')
 
-contract('Auction', function (accounts) {
+contract('Auction1B1P', function (accounts) {
   let owner = accounts[0]
   let bidderA = accounts[1]
   let bidderB = accounts[2]
@@ -16,7 +16,7 @@ contract('Auction', function (accounts) {
 
   beforeEach(async function() {
     timestampEnd = web3.eth.getBlock('latest').timestamp  +  duration; // 1 hour from now
-    auction = await Auction.new(1e18, timestampEnd, beneficiary, {from: owner});
+    auction = await Auction1B1P.new(1e18, timestampEnd, beneficiary, {from: owner});
   });
 
   it('Should be able to set up the constructor auction', async function() {
