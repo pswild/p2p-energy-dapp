@@ -3,6 +3,8 @@ import React, { Component } from 'react'
 // UI Components
 import TestButtonContainer from './ui/testbutton/TestButtonContainer'
 
+// React 16+:
+
 // Load Bootstrap components individually.
 // import Card from 'react-bootstrap/Card'
 // import Button from 'react-bootstrap/Button'
