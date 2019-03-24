@@ -30,6 +30,8 @@ class App extends Component {
       };
     }
 
+// Load contract.
+
   async componentDidMount() {
     try {
       // Get network provider and web3 instance.
@@ -73,6 +75,8 @@ class App extends Component {
     // Update state with the result.
     this.setState({ storageValue: response });
   };
+
+// Render.
 
   render() {
     if (!this.state.web3) {

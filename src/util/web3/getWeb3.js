@@ -14,9 +14,16 @@ let getWeb3 = new Promise(function(resolve, reject) {
   window.addEventListener('load', function(dispatch) {
     var results
     var web3 = window.web3
+    var isMetaMask
 
     // Checking if Web3 has been injected by the browser (Mist/MetaMask)
     if (typeof web3 !== 'undefined') {
+      // Confirm MetaMask is being used.
+      isMetaMask = web3.currentProvider.isMetaMask;
+      if (isMetaMask) {
+        console.log("MetaMask is Web3 provider.")
+      }
+
       // Use Mist/MetaMask's provider.
       web3 = new Web3(web3.currentProvider)
 
