@@ -3,10 +3,11 @@ import { Link } from 'react-router'
 import { HiddenOnlyAuth, VisibleOnlyAuth } from './util/wrappers.js'
 
 // Web3.
-import getWeb3 from "./util/web3/getWeb3";
+import Web3 from 'web3'
+import { getWeb3 } from './util/web3/getWeb3.js'
 
 // Contracts.
-import SimpleStorageContract from "../contracts/SimpleStorage.sol";
+import SimpleStorageContract from '../contracts/SimpleStorage.sol'
 
 // UI Components
 import LoginButtonContainer from './user/ui/loginbutton/LoginButtonContainer'
@@ -34,8 +35,11 @@ class App extends Component {
 
   async componentDidMount() {
     try {
-      // Get network provider and web3 instance.
-      const web3 = await getWeb3();
+      // Web3.
+      var web3 = window.web3
+
+      // Use Mist/MetaMask's provider.
+      web3 = new Web3(web3.currentProvider)
 
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
@@ -58,7 +62,7 @@ class App extends Component {
       );
       console.error(error);
     }
-  };
+  }
 
   async runExample() {
     const {
