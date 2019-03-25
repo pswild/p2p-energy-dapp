@@ -7,8 +7,8 @@ contract Auction1B1P {
   //string public instructions; // will be used for delivery address or email
   uint public utilityBuyBackRate;
   bool public initialPrice = true; // at first asking price is OK, then +25% required
-  //uint public timestampEnd;
-  //address public beneficiary;
+  uint public timestampEnd;
+  address public beneficiary;
   bool public finalized = false;
 
   address public owner;
@@ -20,13 +20,13 @@ contract Auction1B1P {
   uint public increaseTimeIfBidBeforeEnd = 24 * 60 * 60;
   uint public increaseTimeBy = 24 * 60 * 60;
 
-  event BidEvent(address indexed bidder, uint value);//, uint timestamp); // cannot have event and struct with the same name
-  event Refund(address indexed bidder, uint value);//, uint timestamp);
+  event BidEvent(address indexed bidder, uint value, uint timestamp); // cannot have event and struct with the same name
+  event Refund(address indexed bidder, uint value, uint timestamp);
 
 
   modifier onlyOwner { require(owner == msg.sender, "only owner"); _; }
   modifier onlyWinner { require(winner == msg.sender, "only winner"); _; }
-  //modifier ended { require(now > timestampEnd, "not ended yet"); _; }
+  modifier ended { require(now > timestampEnd, "not ended yet"); _; }
 
 
   //function setDescription(string _description) public onlyOwner() {
@@ -39,15 +39,13 @@ contract Auction1B1P {
   //}
 
   //constructor(uint _price, string _description, uint _timestampEnd, address _beneficiary) public {
-  //constructor(uint _utilityBuyBackRate, uint _timestampEnd, address _beneficiary) public {
-    //require(_timestampEnd > now, "end of the auction must be in the future");
-  constructor() public {
+  constructor(uint _utilityBuyBackRate, uint _timestampEnd, address _beneficiary) public {
+    require(_timestampEnd > now, "end of the auction must be in the future");
     owner = msg.sender;
-    //utilityBuyBackRate = _utilityBuyBackRate;
-    utilityBuyBackRate = 1;
+    utilityBuyBackRate = _utilityBuyBackRate;
     //description = _description;
-    //timestampEnd = _timestampEnd;
-    //beneficiary = _beneficiary;
+    timestampEnd = _timestampEnd;
+    beneficiary = _beneficiary;
   }
 
   // Same for all the derived contract, it's the implementation of refund() and bid() that differs
@@ -60,7 +58,7 @@ contract Auction1B1P {
   }
 
   function bid() public payable {
-    //require(now < timestampEnd, "auction has ended"); // sending ether only allowed before the end
+    require(now < timestampEnd, "auction has ended"); // sending ether only allowed before the end
     require(bids[msg.sender] == 0, "you can only bid once");
 
 
@@ -69,9 +67,9 @@ contract Auction1B1P {
 
     require(bids[msg.sender] >= utilityBuyBackRate, "bid too low, minimum is the utilityBuyBackRate");
 
-    //if (now > timestampEnd - increaseTimeIfBidBeforeEnd) {
-      //timestampEnd = now + increaseTimeBy;
-    //}
+    if (now > timestampEnd - increaseTimeIfBidBeforeEnd) {
+      timestampEnd = now + increaseTimeBy;
+    }
 
     initialPrice = false;
     //price = bids[msg.sender]; makes the bid the new low, not needed here
@@ -79,15 +77,15 @@ contract Auction1B1P {
       winner = msg.sender;
     }
 
-    emit BidEvent(winner, msg.value);//, now);
+    emit BidEvent(winner, msg.value, now);
   }
 
-  function finalize() public {//ended() onlyOwner() {
+  function finalize() public ended() onlyOwner() {
     require(finalized == false, "can withdraw only once");
     require(initialPrice == false, "can withdraw only if there were bids");
 
     finalized = true;
-    //beneficiary.transfer(bids[winner]);
+    beneficiary.transfer(bids[winner]);
   }
 
   function refund(address addr) private {
@@ -98,7 +96,7 @@ contract Auction1B1P {
     bids[addr] = 0;
     addr.transfer(refundValue);
 
-    emit Refund(addr, refundValue);//, now);
+    emit Refund(addr, refundValue, now);
   }
 
   function refund() public {
