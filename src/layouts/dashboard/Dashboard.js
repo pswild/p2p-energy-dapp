@@ -174,17 +174,14 @@ class Dashboard extends Component {
             <p><strong>Congratulations, {this.props.authData.name}!</strong></p>
             <p>If you're seeing this page, you've logged in with uPort successfully. Navigate to your profile for more information.</p>
 
+            <h2>Simple Storage</h2>
+            <div>The stored value is: {this.state.storageValue}</div>
+
             <h2>Auction</h2>
             <p>Specify your auction preferences here.</p>
 
             <AuctionForm></AuctionForm>
-
-            <p>
-              If your contracts compiled and migrated successfully, below will show
-              a stored value of 5 (by default).
-            </p>
-            <div>The stored value is: {this.state.storageValue}</div>
-
+            
             <h2>Statistics</h2>
             <h3>Energy Usage</h3>
             <p>Display energy usage graph here.</p>
