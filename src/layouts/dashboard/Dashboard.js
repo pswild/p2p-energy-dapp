@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 
 // UI Components
+import AuctionForm from './AuctionForm.js'
 import TestButtonContainer from './ui/testbutton/TestButtonContainer'
 
 // React 16+:
@@ -99,13 +100,7 @@ class Dashboard extends Component {
             <h2>Auction</h2>
             <p>Specify your auction preferences here.</p>
 
-            <form>
-              <label>
-                Input a bid (Eth):
-                <input type="text" name="name" />
-              </label>
-              <input type="submit" value="Submit" />
-            </form>
+            <AuctionForm></AuctionForm>
 
             <h2>Statistics</h2>
             <h3>Energy Usage</h3>
