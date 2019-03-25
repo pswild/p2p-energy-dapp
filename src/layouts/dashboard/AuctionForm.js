@@ -55,24 +55,28 @@ class AuctionForm extends React.Component {
   }
 
   handleChange(event) {
-    this.setState({value: event.target.value});
+    this.setState({
+      value: event.target.value
+    });
   }
 
   // Test contract.
   async handleSubmit(event) {
-    const {
-      accounts,
-      contract
-    } = this.state;
+    // Alert.
+    alert("The bid is: " + this.state.value)
 
     // Stores a given value.
-    await contract.methods.set(this.state.value).send({ from: accounts[0] });
+    await this.state.contract.methods.set(this.state.value).send({
+      from: this.state.accounts[0]
+    });
 
     // Get the value from the contract to prove it worked.
-    const response = await contract.methods.get().call();
+    const response = await this.state.contract.methods.get().call();
 
     // Update state with the result.
-    this.setState({ storageValue: response });
+    this.setState({
+      storageValue: response
+    });
 
     event.preventDefault();
   }
