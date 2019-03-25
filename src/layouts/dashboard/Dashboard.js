@@ -99,7 +99,6 @@ class Dashboard extends Component {
             <h2>Auction</h2>
             <p>Specify your auction preferences here.</p>
 
-
             <h2>Statistics</h2>
             <h3>Energy Usage</h3>
             <p>Display energy usage graph here.</p>

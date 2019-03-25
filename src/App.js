@@ -8,6 +8,10 @@ import { getWeb3 } from './util/web3/getWeb3.js'
 
 // Contracts.
 import SimpleStorageContract from '../build/contracts/SimpleStorage.json'
+import AuctionContract from '../build/contracts/Auction.json'
+// import Auction1B1PContract from '../build/contracts/Auction1B1P.json'
+// import MigrationsContract from '../build/contracts/Migrations.json'
+
 
 // UI Components
 import LoginButtonContainer from './user/ui/loginbutton/LoginButtonContainer'
