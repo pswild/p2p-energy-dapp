@@ -99,6 +99,14 @@ class Dashboard extends Component {
             <h2>Auction</h2>
             <p>Specify your auction preferences here.</p>
 
+            <form>
+              <label>
+                Input a bid (Eth):
+                <input type="text" name="name" />
+              </label>
+              <input type="submit" value="Submit" />
+            </form>
+
             <h2>Statistics</h2>
             <h3>Energy Usage</h3>
             <p>Display energy usage graph here.</p>
