@@ -28,5 +28,11 @@ module.exports = {
       port: 8545,
       network_id: 4 // Rinkeby ID
     }
+  },
+  // Solidity compiler.
+  compilers: {
+    solc: {
+      version: "0.4.24"
+    }
   }
 };

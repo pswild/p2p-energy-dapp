@@ -1,9 +1,7 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.24;
 
 // THIS IS A SEALED-BID FIRST PRICE AUCTION
 contract Auction1B1P {
-/*
-  //string public description;
   //string public instructions; // will be used for delivery address or email
   uint public utilityBuyBackRate;
   bool public initialPrice = true; // at first asking price is OK, then +25% required
@@ -106,5 +104,4 @@ contract Auction1B1P {
   function refundOnBehalf(address addr) public onlyOwner() {
     refund(addr);
   }
- */
 }
