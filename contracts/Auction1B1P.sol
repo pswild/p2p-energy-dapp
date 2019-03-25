@@ -2,7 +2,7 @@ pragma solidity ^0.4.23;
 
 // THIS IS A SEALED-BID FIRST PRICE AUCTION
 contract Auction1B1P {
-
+/*
   //string public description;
   //string public instructions; // will be used for delivery address or email
   uint public utilityBuyBackRate;
@@ -106,5 +106,5 @@ contract Auction1B1P {
   function refundOnBehalf(address addr) public onlyOwner() {
     refund(addr);
   }
-
+ */
 }

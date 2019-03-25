@@ -7,7 +7,7 @@ import Web3 from 'web3'
 import { getWeb3 } from './util/web3/getWeb3.js'
 
 // Contracts.
-import SimpleStorageContract from '../contracts/SimpleStorage.sol'
+import SimpleStorageContract from '../build/contracts/SimpleStorage.json'
 
 // UI Components
 import LoginButtonContainer from './user/ui/loginbutton/LoginButtonContainer'
@@ -122,9 +122,6 @@ class App extends Component {
         <p>
           If your contracts compiled and migrated successfully, below will show
           a stored value of 5 (by default).
-        </p>
-        <p>
-          Try changing the value stored on <strong>line 40</strong> of App.js.
         </p>
         <div>The stored value is: {this.state.storageValue}</div>
 
