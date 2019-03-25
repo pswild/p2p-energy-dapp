@@ -1,10 +1,20 @@
 import React, { Component } from 'react'
 
+// Web3.
+import Web3 from 'web3'
+import { getWeb3 } from '../../util/web3/getWeb3.js'
+
+// Contracts.
+import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
+// import AuctionContract from './build/contracts/Auction.json'
+// import Auction1B1PContract from './build/contracts/Auction1B1P.json'
+// import MigrationsContract from './build/contracts/Migrations.json'
+
 // UI Components
 import AuctionForm from './AuctionForm.js'
 import TestButtonContainer from './ui/testbutton/TestButtonContainer'
 
-// React 16+:
+// Bootstrap (React 16+).
 
 // Load Bootstrap components individually.
 // import Card from 'react-bootstrap/Card'
@@ -28,6 +38,8 @@ import * as ReactD3 from 'react-d3'
 
 // Load usage data.
 import data from './data/jan18_jan19.csv'
+
+// Data visualization.
 
 // Current date and time.
 var current = new Date();
@@ -81,19 +93,84 @@ D3.csv(data).then(function(data) {
   ];
 });
 
+// Dashboard.
+
 class Dashboard extends Component {
+
   constructor(props, { authData }) {
     super(props);
+    this.state= {
+      storageValue: 0,
+      web3: null,
+      accounts: null,
+      contract: null
+    };
+
+    // uPort authentication information.
     authData = this.props;
   }
 
+  // Load contract.
+  async componentDidMount() {
+    try {
+      // Web3.
+      var web3 = window.web3
+
+      // Use Mist/MetaMask's provider.
+      web3 = new Web3(web3.currentProvider)
+
+      // Use web3 to get the user's accounts.
+      const accounts = await web3.eth.getAccounts();
+
+      // Get the contract instance.
+      const networkId = await web3.eth.net.getId();
+      const deployedNetwork = SimpleStorageContract.networks[networkId];
+      const instance = new web3.eth.Contract(
+        SimpleStorageContract.abi,
+        deployedNetwork && deployedNetwork.address,
+      );
+
+      // Set web3, accounts, and contract to the state, and then proceed with an
+      // example of interacting with the contract's methods.
+      this.setState({ web3, accounts, contract: instance }, this.runExample);
+    } catch (error) {
+      // Catch any errors for any of the above operations.
+      alert(
+        `Failed to load web3, accounts, or contract. Check console for details.`,
+      );
+      console.error(error);
+    }
+  }
+
+  // Test contract.
+  async runExample() {
+    const {
+      accounts,
+      contract
+    } = this.state;
+
+    // Stores a given value, 5 by default.
+    await contract.methods.set(5).send({ from: accounts[0] });
+
+    // Get the value from the contract to prove it worked.
+    const response = await contract.methods.get().call();
+
+    // Update state with the result.
+    this.setState({ storageValue: response });
+  };
+
   render() {
+    if (!this.state.web3) {
+      return <div>Loading Web3, accounts, and contract...</div>;
+    }
+
     return(
       <main className="container">
         <div className="pure-g">
           <div className="pure-u-1-1">
 
             <h1>Dashboard</h1>
+
             <p><strong>Congratulations, {this.props.authData.name}!</strong></p>
             <p>If you're seeing this page, you've logged in with uPort successfully. Navigate to your profile for more information.</p>
 
@@ -101,6 +178,12 @@ class Dashboard extends Component {
             <p>Specify your auction preferences here.</p>
 
             <AuctionForm></AuctionForm>
+
+            <p>
+              If your contracts compiled and migrated successfully, below will show
+              a stored value of 5 (by default).
+            </p>
+            <div>The stored value is: {this.state.storageValue}</div>
 
             <h2>Statistics</h2>
             <h3>Energy Usage</h3>
