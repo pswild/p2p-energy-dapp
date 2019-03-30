@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 
 // Web3.
 import Web3 from 'web3'
-import { getWeb3 } from '../../util/web3/getWeb3.js'
+// import { getWeb3 } from '../../util/web3/getWeb3.js'
 
 // Contracts.
 import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
@@ -181,7 +181,7 @@ class Dashboard extends Component {
             <p>Specify your auction preferences here.</p>
 
             <AuctionForm></AuctionForm>
-            
+
             <h2>Statistics</h2>
             <h3>Energy Usage</h3>
             <p>Display energy usage graph here.</p>
