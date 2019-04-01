@@ -17,6 +17,8 @@ export function loginUser() {
       requested: ['name', 'phone', 'country', 'email'],
       notifications: true
     }).then((credentials) => {
+      console.log(credentials)
+
       dispatch(userLoggedIn(credentials))
 
       // Used a manual redirect here as opposed to a wrapper.
@@ -29,6 +31,8 @@ export function loginUser() {
       }
 
       return browserHistory.push('/dashboard')
+    }).catch(function(error) {
+      console.log("Error requesting uPort credentials: " + error);
     })
   }
 }
