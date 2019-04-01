@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */ // Avoid the linter considering truffle elements as undef.
-const Auction1B1P = artifacts.require('Auction1B1P.sol')
+const Auction1B2P = artifacts.require('Auction1B2P.sol')
 const { expectThrow, increaseTime } = require('./helpers')
 
-contract('Auction1B1P', function (accounts) {
+contract('Auction1B2P', function (accounts) {
   let owner = accounts[0]
   let bidderA = accounts[1]
   let bidderB = accounts[2]
@@ -16,7 +16,7 @@ contract('Auction1B1P', function (accounts) {
 
   beforeEach(async function() {
     timestampEnd = web3.eth.getBlock('latest').timestamp  +  duration; // 1 hour from now
-    auction = await Auction1B1P.new(1e18, timestampEnd, beneficiary, {from: owner});
+    auction = await Auction1B2P.new(1e18, timestampEnd, beneficiary, {from: owner});
   });
 
   it('Should be able to set up the constructor auction', async function() {
@@ -60,9 +60,10 @@ contract('Auction1B1P', function (accounts) {
     assert.equal(await auction.winner(), bidderA, "Winner not set up correctly");
   });
 
-  it('Beneficiary should receive ETH equal to winning bid', async function() {
+  it('Beneficiary should receive ETH equal to second place bid', async function() {
     await auction.sendTransaction({ value: 1e18, from: bidderA });
     await auction.sendTransaction({ value: 2e18, from: bidderB });
+    await auction.sendTransaction({ value: 3e18, from: bidderC });
     await expectThrow(auction.finalize({ from: owner })); // cannot withdraw before the end
 
     increaseTime(duration + 1);
@@ -73,6 +74,8 @@ contract('Auction1B1P', function (accounts) {
     var balanceAfter = web3.eth.getBalance(beneficiary).toNumber()
     console.log(balanceAfter)
     assert.equal(balanceBefore + 2e18, balanceAfter, "beneficiary didn't receive correct amount")
+    assert.equal(await auction.winner(), bidderC, "Winner not set up correctly");
+    assert.equal(await auction.secondPlace(), bidderB, "Second Place not set up correctly");
 
     await expectThrow(auction.finalize({ from: owner })); // cannot withdraw more than once
   });
@@ -94,9 +97,9 @@ contract('Auction1B1P', function (accounts) {
   });
 
 
-  it('Should NOT be able to withdraw if the highest bidder', async function() {
-    await auction.sendTransaction({ value: 1e18, from: bidderA });
-    await expectThrow( auction.refund({ from: bidderA }) );
-  });
+  //it('Should NOT be able to withdraw if the highest bidder', async function() {
+    //await auction.sendTransaction({ value: 1e18, from: bidderA });
+    //await expectThrow( auction.refund({ from: bidderA }) );
+  //});
 
 });
