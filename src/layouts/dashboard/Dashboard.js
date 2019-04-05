@@ -2,13 +2,9 @@ import React, { Component } from 'react'
 
 // Web3.
 import Web3 from 'web3'
-// import { getWeb3 } from '../../util/web3/getWeb3.js'
 
 // Contracts.
 import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
-// import AuctionContract from './build/contracts/Auction.json'
-// import Auction1B1PContract from './build/contracts/Auction1B1P.json'
-// import MigrationsContract from './build/contracts/Migrations.json'
 
 // UI Components
 import AuctionForm from './AuctionForm.js'
@@ -130,8 +126,12 @@ class Dashboard extends Component {
         deployedNetwork && deployedNetwork.address,
       );
 
-      // Set web3, accounts, and contract to the state, and then proceed with an
-      // example of interacting with the contract's methods.
+      // Log details.
+      console.log("Deployed Network ID: " + networkId);
+      console.log("Deployed Network Contract Address: " + deployedNetwork.address);
+      console.log("Accounts: " + accounts);
+
+      // Set web3, accounts, and contract to the state, and then proceed with an example of interacting with the contract's methods.
       this.setState({ web3, accounts, contract: instance }, this.runExample);
     } catch (error) {
       // Catch any errors for any of the above operations.

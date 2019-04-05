@@ -2,7 +2,6 @@ import React, { ReactDOM } from 'react'
 
 // Web3.
 import Web3 from 'web3'
-import { getWeb3 } from '../../util/web3/getWeb3.js'
 
 // Contracts.
 import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
@@ -11,8 +10,8 @@ class AuctionForm extends React.Component {
   constructor(props) {
     super(props);
     this.state= {
-      value: '',
-      storageValue: null,
+      value: "",
+      storageValue: "[Bids appear here once submitted.]",
       web3: null,
       accounts: null,
       contract: null
@@ -42,8 +41,7 @@ class AuctionForm extends React.Component {
         deployedNetwork && deployedNetwork.address,
       );
 
-      // Set web3, accounts, and contract to the state, and then proceed with an
-      // example of interacting with the contract's methods.
+      // Set web3, accounts, and contract to the state, and then proceed with an example of interacting with the contract's methods.
       this.setState({ web3, accounts, contract: instance }, this.runExample);
     } catch (error) {
       // Catch any errors for any of the above operations.
