@@ -17,6 +17,7 @@ export function loginUser() {
       requested: ['name', 'phone', 'country', 'email'],
       notifications: true
     }).then((credentials) => {
+      // Log credentials if received.
       console.log(credentials)
 
       dispatch(userLoggedIn(credentials))
