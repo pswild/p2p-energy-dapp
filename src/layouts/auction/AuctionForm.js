@@ -30,6 +30,9 @@ class AuctionForm extends Component {
       // Use Mist/MetaMask's provider.
       web3 = new Web3(web3.currentProvider)
 
+      // Enable MetaMask.
+      await web3.currentProvider.enable();
+
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
 
