@@ -46,6 +46,13 @@ contract('Auction1B2P', function (accounts) {
     auction = await Auction1B2P.new(1e18, timestampEnd, beneficiary, {from: owner});
   });
 
+  it('Should be able to set up the constructor auction', async function() {
+    assert.equal(await auction.owner(), owner, 'The owner is not set correctly')
+    //assert.equal(await auction.description(), "item", 'The description is not set correctly')
+    assert.equal(await auction.timestampEnd(), timestampEnd, 'The endtime is not set correctly')
+    assert.equal(await auction.beneficiary(), beneficiary, 'The beneficiary is not set correctly')
+  })
+
   it('Testing whole auction model', async function() {
     for (i = 0; i < 10; i++) {
 
