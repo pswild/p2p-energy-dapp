@@ -33,7 +33,7 @@ import * as D3 from "d3"
 import * as ReactD3 from 'react-d3'
 
 // Load usage data.
-import data from './data/jan18_jan19.csv'
+import data from '../../../data/jan18_jan19.csv'
 
 // Data visualization.
 
