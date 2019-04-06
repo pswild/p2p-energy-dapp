@@ -26,6 +26,9 @@ class App extends Component {
           <Link to="/" className="pure-menu-link">Home</Link>
         </li>
         <li className="pure-menu-item">
+          <Link to="/auction" className="pure-menu-link">Auction</Link>
+        </li>
+        <li className="pure-menu-item">
           <Link to="/dashboard" className="pure-menu-link">Dashboard</Link>
         </li>
         <li className="pure-menu-item">
@@ -37,6 +40,12 @@ class App extends Component {
 
     const OnlyGuestLinks = HiddenOnlyAuth(() =>
       <span>
+        <li className="pure-menu-item">
+          <Link to="/" className="pure-menu-link">Home</Link>
+        </li>
+        <li className="pure-menu-item">
+          <Link to="/auction" className="pure-menu-link">Auction</Link>
+        </li>
         <LoginButtonContainer />
       </span>
     )

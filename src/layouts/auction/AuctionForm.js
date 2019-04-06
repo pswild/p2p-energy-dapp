@@ -1,4 +1,4 @@
-import React, { ReactDOM } from 'react'
+import React, { Component } from 'react'
 
 // Web3.
 import Web3 from 'web3'
@@ -6,12 +6,12 @@ import Web3 from 'web3'
 // Contracts.
 import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
 
-class AuctionForm extends React.Component {
+class AuctionForm extends Component {
   constructor(props) {
     super(props);
     this.state= {
       value: "",
-      storageValue: "[Bids appear here once submitted.]",
+      storageValue: "[No bids have been submitted.]",
       web3: null,
       accounts: null,
       contract: null
@@ -60,8 +60,10 @@ class AuctionForm extends React.Component {
 
   // Test contract.
   async handleSubmit(event) {
+    event.preventDefault();
+
     // Alert.
-    alert("The bid is: " + this.state.value)
+    // alert("The bid is: " + this.state.value)
 
     // Stores a given value.
     await this.state.contract.methods.set(this.state.value).send({
@@ -75,20 +77,21 @@ class AuctionForm extends React.Component {
     this.setState({
       storageValue: response
     });
-
-    event.preventDefault();
   }
 
   render() {
     return (
+
       <form onSubmit={this.handleSubmit}>
+        <p>Input bid ($): </p>
         <label>
-          Input bid (Eth):
           <input type="text" value={this.state.value} onChange={this.handleChange} />
         </label>
         <input type="submit" value="Submit" />
+        <p></p>
         <div>The bid is: {this.state.storageValue}</div>
       </form>
+
     );
   }
 }

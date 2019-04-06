@@ -7,7 +7,6 @@ import Web3 from 'web3'
 import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
 
 // UI Components
-import AuctionForm from './AuctionForm.js'
 import TestButtonContainer from './ui/testbutton/TestButtonContainer'
 
 // Bootstrap (React 16+).
@@ -96,7 +95,7 @@ class Dashboard extends Component {
   constructor(props, { authData }) {
     super(props);
     this.state= {
-      storageValue: 0,
+      storageValue: "[Error]",
       web3: null,
       accounts: null,
       contract: null
@@ -176,11 +175,6 @@ class Dashboard extends Component {
 
             <h2>Simple Storage</h2>
             <div>The stored value is: {this.state.storageValue}</div>
-
-            <h2>Auction</h2>
-            <p>Specify your auction preferences here.</p>
-
-            <AuctionForm></AuctionForm>
 
             <h2>Statistics</h2>
             <h3>Energy Usage</h3>
