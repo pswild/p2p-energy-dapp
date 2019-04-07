@@ -31,7 +31,7 @@ export function loginUser() {
         return browserHistory.push(decodeURIComponent(currentLocation.query.redirect))
       }
 
-      return browserHistory.push('/dashboard')
+      return browserHistory.push('/profile')
     }).catch(function(error) {
       console.log("Error requesting uPort credentials: " + error);
     })

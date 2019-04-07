@@ -3,6 +3,8 @@ import React, { Component } from 'react'
 class Profile extends Component {
   constructor(props, { authData }) {
     super(props)
+
+    // uPort authentication information.
     authData = this.props
   }
 
@@ -12,8 +14,13 @@ class Profile extends Component {
         <div className="pure-g">
           <div className="pure-u-1-1">
             <h1>Profile</h1>
-            <p>Change these details in your uPort mobile app to see them reflected here.</p>
+
+            <p><strong>Congratulations, {this.props.authData.name}!</strong></p>
+            <p>If you're seeing this page, you've logged in with uPort successfully. Navigate to your dashboard for more information.</p>
+
             <h2>Contact Information</h2>
+
+            <p>Change these details in your uPort mobile app to see them reflected here.</p>
 
             <p>
               <strong><i>Name</i></strong><br />

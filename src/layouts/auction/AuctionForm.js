@@ -9,6 +9,8 @@ import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
 class AuctionForm extends Component {
   constructor(props) {
     super(props);
+
+    // Set state.
     this.state= {
       value: "",
       storageValue: "[No bids have been submitted.]",
@@ -17,6 +19,7 @@ class AuctionForm extends Component {
       contract: null
     };
 
+    // Handle changes.
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -44,6 +47,11 @@ class AuctionForm extends Component {
         deployedNetwork && deployedNetwork.address,
       );
 
+      // Log details.
+      console.log("Deployed Network ID: " + networkId);
+      console.log("Deployed Network Contract Address: " + deployedNetwork.address);
+      console.log("Accounts: " + accounts);
+
       // Set web3, accounts, and contract to the state, and then proceed with an example of interacting with the contract's methods.
       this.setState({ web3, accounts, contract: instance }, this.runExample);
     } catch (error) {
@@ -63,18 +71,23 @@ class AuctionForm extends Component {
 
   // Test contract.
   async handleSubmit(event) {
+    // Prevent page reload.
     event.preventDefault();
 
-    // Alert.
-    // alert("The bid is: " + this.state.value)
+    // Get state.
+    const {
+      accounts,
+      contract
+    } = this.state;
+
 
     // Stores a given value.
-    await this.state.contract.methods.set(this.state.value).send({
-      from: this.state.accounts[0]
+    await contract.methods.set(this.state.value).send({
+      from: accounts[0]
     });
 
     // Get the value from the contract to prove it worked.
-    const response = await this.state.contract.methods.get().call();
+    const response = await contract.methods.get().call();
 
     // Update state with the result.
     this.setState({
@@ -83,6 +96,11 @@ class AuctionForm extends Component {
   }
 
   render() {
+    // Handle loading issues.
+    if (!this.state.web3) {
+      return <div>Loading Web3, accounts, and contract...</div>;
+    }
+
     return (
 
       <form onSubmit={this.handleSubmit}>
