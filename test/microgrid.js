@@ -1,25 +1,36 @@
 // Project: Energy as a Commodity.
 // Description: Testing framework for microgrid using real data.
 
+// D3 CSV Parser.
+//import * as Papa from 'papaparse';
+
+
 // Helper functions.
 const { expectThrow, increaseTime } = require('./helpers')
-
-// D3 CSV Parser.
-import * as D3 from "d3"
 
 // Contracts.
 const Auction1B2P = artifacts.require('Auction1B2P.sol')
 
+//Papa.parse("./test/SunDance_11.csv", {
+//    complete: function(results) {
+//        console.log("Finished:", results.data);
+//    }
+//});
+
 // Load usage data.
-import data_name from './path/to/data.csv'
+//import data_name from './path/to/data.csv'
 // ...
 
 // Parse CSV data.
 // Parse CSV file.
-D3.csv(data).then(function(data) {
+//d3.csv(data).then(function(data) {
   // CSV format: ["Account", "SPID", "MID", "Time", "Channel", "kWh"].
 
-};
+//};
+
+//d3.csv("/data/cities.csv").then(function(data) {
+//  console.log(data[0]);
+//});
 
 // Test.
 contract('Auction1B2P', function (accounts) {
@@ -53,20 +64,19 @@ contract('Auction1B2P', function (accounts) {
     assert.equal(await auction.beneficiary(), beneficiary, 'The beneficiary is not set correctly')
   })
 
+// where sdX refers to SunDance file X
   it('Testing whole auction model', async function() {
     for (i = 0; i < 10; i++) {
 
-      //bid1 = CSVDATALINE(i) * 10^18
-
-      await auction.sendTransaction({ value: bid1, from: bidder1 });
-      await auction.sendTransaction({ value: bid2, from: bidder2 });
-      await auction.sendTransaction({ value: bid3, from: bidder3 });
-      await auction.sendTransaction({ value: bid4, from: bidder4 });
-      await auction.sendTransaction({ value: bid5, from: bidder5 });
-      await auction.sendTransaction({ value: bid6, from: bidder6 });
-      await auction.sendTransaction({ value: bid7, from: bidder7 });
-      await auction.sendTransaction({ value: bid8, from: bidder8 });
-      await auction.sendTransaction({ value: bid9, from: bidder9 });
+      await auction.sendTransaction({ value: (sd1[i][1]*10^18), from: bidder1 });
+      await auction.sendTransaction({ value: (sd2[i][1]*10^18), from: bidder2 });
+      await auction.sendTransaction({ value: (sd3[i][1]*10^18), from: bidder3 });
+      await auction.sendTransaction({ value: (sd4[i][1]*10^18), from: bidder4 });
+      await auction.sendTransaction({ value: (sd5[i][1]*10^18), from: bidder5 });
+      await auction.sendTransaction({ value: (sd6[i][1]*10^18), from: bidder6 });
+      await auction.sendTransaction({ value: (sd7[i][1]*10^18), from: bidder7 });
+      await auction.sendTransaction({ value: (sd8[i][1]*10^18), from: bidder8 });
+      await auction.sendTransaction({ value: (sd9[i][1]*10^18), from: bidder9 });
       await expectThrow(auction.finalize({ from: owner })); // cannot withdraw before the end
 
 
@@ -78,10 +88,11 @@ contract('Auction1B2P', function (accounts) {
       await auction.finalize({ from: owner });
       var balanceAfter = web3.eth.getBalance(beneficiary).toNumber()
       var winningPrice = balanceAfter-balanceBefore
-      console.log(winningPrice)
       assert.equal(balanceBefore + winningPrice, balanceAfter, "beneficiary didn't receive correct amount")
-      assert.equal(await auction.winner(), bidder9, "Winner not set up correctly");
-      assert.equal(await auction.secondPlace(), bidder8, "Second Place not set up correctly");
+      console.log(winningPrice)
+      console.log(await auction.winner())
+      //assert.equal(await auction.winner(), bidder9, "Winner not set up correctly");
+      //assert.equal(await auction.secondPlace(), bidder8, "Second Place not set up correctly");
     }
 
     await expectThrow(auction.finalize({ from: owner })); // cannot withdraw more than once
