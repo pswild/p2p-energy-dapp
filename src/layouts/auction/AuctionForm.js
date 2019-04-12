@@ -13,7 +13,8 @@ class AuctionForm extends Component {
     // Set state.
     this.state= {
       value: "",
-      storageValue: "[No bids have been submitted.]",
+      bid: "[No bids have been submitted.]",
+      bidder: "[No bidders have bidded.]",
       web3: null,
       accounts: null,
       contract: null
@@ -39,6 +40,9 @@ class AuctionForm extends Component {
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
 
+      // Note: accounts is only populated by the default address selected in
+      // MetaMask. This can be accessed at "accounts[0]".
+
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = SimpleStorageContract.networks[networkId];
@@ -47,24 +51,22 @@ class AuctionForm extends Component {
         deployedNetwork && deployedNetwork.address,
       );
 
-      // Log details.
-      console.log("Deployed Network ID: " + networkId);
-      console.log("Deployed Network Contract Address: " + deployedNetwork.address);
-      console.log("Accounts: ");
-      console.log(accounts);
+      // Log.
+      // console.log("Deployed Network ID: " + networkId);
+      // console.log("Deployed Contract Address: " + deployedNetwork.address);
+      // console.log("Deployed Account Address: " + accounts[0]);
 
       // Set web3, accounts, and contract to the state, and then proceed with an example of interacting with the contract's methods.
       this.setState({ web3, accounts, contract: instance }, this.runExample);
     } catch (error) {
       // Catch any errors for any of the above operations.
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
+      alert(`Failed to load web3, accounts, or contract. Check console for details.`);
       console.error(error);
     }
   }
 
   handleChange(event) {
+    // Set state.
     this.setState({
       value: event.target.value
     });
@@ -90,36 +92,18 @@ class AuctionForm extends Component {
     // Get the value from the contract to prove it worked.
     const response = await contract.methods.get().call();
 
-    // Update state with the result.
+    // Set state.
     this.setState({
-      storageValue: response
+      bid: response,
+      bidder: accounts[0]
     });
   }
 
   // Run example.
   async runExample() {
-    // Users array.
-    var users = [];
-    // Create users.
-    for (var k = 0; k < 10; k++) {
-      // User object.
-      let user = new Object();
 
-      // Generate bids from past usage data.
-      // ...
+    // Test.
 
-      // Add account and bid.
-      user = {
-        account: this.state.accounts[k],
-        bid: k
-      }
-      // Add to users.
-      users.push(user);
-    }
-
-    // Log.
-    console.log("Users: ")
-    console.log(users)
   }
 
   render() {
@@ -137,7 +121,8 @@ class AuctionForm extends Component {
         </label>
         <input type="submit" value="Submit" />
         <p></p>
-        <div>The bid is: {this.state.storageValue}</div>
+        <div>The bid is: {this.state.bid}</div>
+        <div>The bidder is: {this.state.bidder}</div>
       </form>
 
     );
