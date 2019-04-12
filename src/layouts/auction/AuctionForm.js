@@ -50,7 +50,8 @@ class AuctionForm extends Component {
       // Log details.
       console.log("Deployed Network ID: " + networkId);
       console.log("Deployed Network Contract Address: " + deployedNetwork.address);
-      console.log("Accounts: " + accounts);
+      console.log("Accounts: ");
+      console.log(accounts);
 
       // Set web3, accounts, and contract to the state, and then proceed with an example of interacting with the contract's methods.
       this.setState({ web3, accounts, contract: instance }, this.runExample);
@@ -93,6 +94,32 @@ class AuctionForm extends Component {
     this.setState({
       storageValue: response
     });
+  }
+
+  // Run example.
+  async runExample() {
+    // Users array.
+    var users = [];
+    // Create users.
+    for (var k = 0; k < 10; k++) {
+      // User object.
+      let user = new Object();
+
+      // Generate bids from past usage data.
+      // ...
+
+      // Add account and bid.
+      user = {
+        account: this.state.accounts[k],
+        bid: k
+      }
+      // Add to users.
+      users.push(user);
+    }
+
+    // Log.
+    console.log("Users: ")
+    console.log(users)
   }
 
   render() {
