@@ -18,15 +18,6 @@ const D3 = require("d3");
 // Data. //
 ///////////
 
-// SunDance CSV format:
-// ["date", "use", "gen", "grid"].
-
-// Site object format:
-// {"name": file_name, "points": [point]}
-
-// Point object format:
-// {"date": date, "use": use, "gen": gen, grid": grid}
-
 // Log.
 console.log("Loading SunDance data: ");
 

@@ -3,9 +3,6 @@ import React, { Component } from 'react'
 // Web3.
 import Web3 from 'web3'
 
-// D3 JavaScript.
-import * as D3 from "d3"
-
 // Contracts.
 import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
 
