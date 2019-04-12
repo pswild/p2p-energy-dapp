@@ -11,7 +11,7 @@ class AuctionForm extends Component {
     super(props);
 
     // Set state.
-    this.state= {
+    this.state = {
       value: "",
       bid: "[No bids have been submitted.]",
       bidder: "[No bidders have bidded.]",
@@ -56,12 +56,16 @@ class AuctionForm extends Component {
       // console.log("Deployed Contract Address: " + deployedNetwork.address);
       // console.log("Deployed Account Address: " + accounts[0]);
 
-      // Set web3, accounts, and contract to the state, and then proceed with an example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance }, this.runExample);
+      // Set web3, accounts, and contract to the state. Call runExample.
+      this.setState(
+        { web3, accounts, contract: instance },
+        this.runExample
+      );
     } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(`Failed to load web3, accounts, or contract. Check console for details.`);
+
+      alert(`Failed to load web3, accounts, or contract.`);
       console.error(error);
+
     }
   }
 
