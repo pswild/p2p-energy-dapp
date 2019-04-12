@@ -7,6 +7,7 @@ var Auction = artifacts.require("./Auction.sol");
 // D3 JavaScript.
 const D3 = require("d3");
 
+
 ///////////
 // Grid. //
 ///////////
@@ -20,12 +21,6 @@ const D3 = require("d3");
 // SunDance CSV format:
 // ["date", "use", "gen", "grid"].
 
-// Sites array format:
-// [site]
-
-// Points array format:
-// [point]
-
 // Site object format:
 // {"name": file_name, "points": [point]}
 
@@ -33,13 +28,13 @@ const D3 = require("d3");
 // {"date": date, "use": use, "gen": gen, grid": grid}
 
 // Log.
-console.log("SunDance data: ");
+console.log("Loading SunDance data: ");
 
 // List of sites.
 var sites = [];
 
 // Process each site.
-for (var i = 1; i <= 100; i++) {
+for (var i = 0; i <= 0; i++) {
   // Filter missing sites.
   if(i == 2 || i == 6) {
     continue
@@ -58,8 +53,8 @@ for (var i = 1; i <= 100; i++) {
     // List of points at site.
     var points = [];
 
-    // Read each line of CSV.
-    for (var j = 0; j < csv.length; j++) {
+    // Read each line of CSV (skip header).
+    for (var j = 1; j < csv.length; j++) {
 
       // Create new date object.
       var csvDate = csv[j].date.split(" ");
@@ -137,7 +132,7 @@ var nextAuctionString =
 
 contract('Auction', function (accounts) {
 
-  it("...should bid the value 5.", function() {
+  it("...testing the microgrid.", function() {
     return Auction.deployed().then(function(instance) {
       auctionInstance = instance;
 
@@ -145,7 +140,7 @@ contract('Auction', function (accounts) {
     }).then(function() {
       return auctionInstance.get.call();
     }).then(function(value) {
-      assert.equal(value, 5, "The value 5 was not bid.");
+      assert.equal(value, 5, "The microgrid test failed.");
     });
   });
 
