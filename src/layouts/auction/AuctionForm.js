@@ -3,6 +3,9 @@ import React, { Component } from 'react'
 // Web3.
 import Web3 from 'web3'
 
+// D3 JavaScript.
+import * as D3 from "d3"
+
 // Contracts.
 import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
 
@@ -62,10 +65,9 @@ class AuctionForm extends Component {
         this.runExample
       );
     } catch (error) {
-
+      // Throw error.
       alert(`Failed to load web3, accounts, or contract.`);
       console.error(error);
-
     }
   }
 
@@ -105,9 +107,15 @@ class AuctionForm extends Component {
 
   // Run example.
   async runExample() {
+    try  {
 
-    // Test.
+      // Test.
 
+    } catch (error) {
+      // Throw error.
+      alert(`Failed to load example.`);
+      console.error(error);
+    }
   }
 
   render() {
