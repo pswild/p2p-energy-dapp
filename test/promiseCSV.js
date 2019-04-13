@@ -3,6 +3,7 @@ var Promise = require('bluebird');
 
 // Parse CSV. Return promise.
 var promiseCSV = Promise.method(function(path, options) {
+
   return new Promise(function(resolve, reject) {
     var records = [];
 
