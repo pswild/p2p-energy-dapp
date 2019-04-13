@@ -12,9 +12,6 @@ contract Auction {
 
   /* Static */
 
-  // Members of the micro-grid
-  address[10] public members;
-
   // Utility buyback rate
   uint buybackRate = 1;
 
@@ -45,9 +42,4 @@ contract Auction {
     // Return bid for this member
     return bids[msg.sender];
   }
-
-  // Withdraw funds
-  /* function withdraw(uint value) public returns (uint) {
-
-  } */
 }
