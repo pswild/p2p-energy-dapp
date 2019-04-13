@@ -51,6 +51,8 @@ class Auction extends Component {
           <h2>Make a Bid</h2>
           <AuctionForm></AuctionForm>
 
+          <h2>End an Auction</h2>
+          <p>See the auction results here.</p>
         </div>
       </div>
     </main>

@@ -16,7 +16,6 @@ class AuctionForm extends Component {
       bid: "[No bids have been submitted.]",
       bidder: "[No bidders have bidded.]",
       web3: null,
-      accounts: null,
       contract: null
     };
 
@@ -37,11 +36,8 @@ class AuctionForm extends Component {
       // Enable MetaMask.
       await web3.currentProvider.enable();
 
-      // Use web3 to get the user's accounts.
-      const accounts = await web3.eth.getAccounts();
-
-      // Note: accounts is only populated by the default address selected in
-      // MetaMask. This can be accessed at "accounts[0]".
+      // NOTE: Acquire confirmation from the MetaMask account that this
+      // application may view Ethereum addresses.
 
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
@@ -51,14 +47,9 @@ class AuctionForm extends Component {
         deployedNetwork && deployedNetwork.address,
       );
 
-      // Log.
-      // console.log("Deployed Network ID: " + networkId);
-      // console.log("Deployed Contract Address: " + deployedNetwork.address);
-      // console.log("Deployed Account Address: " + accounts[0]);
-
       // Set web3, accounts, and contract to the state. Call runExample.
       this.setState(
-        { web3, accounts, contract: instance },
+        { web3, contract: instance },
         this.runExample
       );
     } catch (error) {
@@ -82,10 +73,14 @@ class AuctionForm extends Component {
 
     // Get state.
     const {
-      accounts,
       contract
     } = this.state;
 
+    // Use web3 to get the user's accounts.
+    const accounts = await this.state.web3.eth.getAccounts();
+
+    // Note: accounts is only populated by the default address selected in
+    // MetaMask. This can be accessed at "accounts[0]".
 
     // Stores a given value.
     await contract.methods.set(this.state.value).send({
