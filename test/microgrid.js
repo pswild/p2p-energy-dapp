@@ -5,8 +5,7 @@
 var Auction = artifacts.require("./Auction.sol");
 
 // CSV parser.
-const csv = require("fast-csv");
-const fs = require('fs');
+var promiseCSV = require('./promiseCSV.js');
 
 ///////////
 // Data. //
@@ -19,71 +18,28 @@ const fs = require('fs');
 var sites = [];
 
 // Process each site.
-for (var i = 1; i <= 100; i++) {
+for (var i = 1; i <= 1; i++) {
 
   // Filter missing sites.
   if(i == 2 || i == 6) {
     continue;
   }
 
-  // File name.
-  var file_name = '/Users/ParkerWild/github/p2p-energy-dapp/data/sundance/SunDance_' + i + '.csv';
+  // Path to file.
+  var path = '/Users/ParkerWild/github/p2p-energy-dapp/data/sundance/';
+  var file_name = 'SunDance_' + i + '.csv';
+
+  // Header options.
+  var options = { 'headers': true };
 
   // Log.
-  // console.log("File name: " + file_name);
+  console.log("File: " + file_name);
 
-  // File reader.
-  function readFile(file_name) {
-
-    // Create read stream.
-    var stream = fs.createReadStream(file_name);
-
-    // Index & batch.
-    // let index = 0;
-    // let batch = 0;
-
-    // List of points at site.
-    var points = [];
-
-    // Create CSV stream.
-    var csvStream = csv().on("data", function(data){
-        // Data operations.
-        // ...
-
-        // Point.
-        let point = {
-          date: data[0],
-          use: data[1],
-          gen: data[2],
-          grid: data[3]
-        }
-
-        // Add to points.
-        points.push(point);
-
-      }).on("end", function(){
-        // Upon completion.
-        // ...
-
-        // Log.
-        // console.log(points);
-
-        // Site.
-        let site = {
-          name: file_name,
-          points: points
-        }
-
-        // Add to sites.
-        sites.push(site);
-      });
-
-    // Pipe.
-    stream.pipe(csvStream);
-  }
-
-  // Read file.
-  readFile(file_name);
+  // CSV parse with promise.
+  promiseCSV(path + file_name, options).then(function (records) {
+    // Log.
+    console.log(records[0]);
+  });
 }
 
 ///////////

@@ -1,6 +1,7 @@
 var csv = require('fast-csv');
 var Promise = require('bluebird');
 
+// Parse CSV. Return promise.
 var promiseCSV = Promise.method(function(path, options) {
   return new Promise(function(resolve, reject) {
     var records = [];
@@ -11,7 +12,8 @@ var promiseCSV = Promise.method(function(path, options) {
       }).on('end', function() {
         resolve(records);
       });
-    };
   });
+});
 
+// Export module.
 module.exports = promiseCSV;
