@@ -16,7 +16,7 @@ const fs = require('fs');
 // ["date", "use", "gen", "grid"].
 
 // Process each site.
-for (var i = 1; i <= 1; i++) {
+for (var i = 1; i <= 100; i++) {
 
   // Filter missing sites.
   if(i == 2 || i == 6) {
