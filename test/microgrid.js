@@ -4,17 +4,87 @@
 // Contracts.
 var Auction = artifacts.require("./Auction.sol");
 
-///////////
-// Grid. //
-///////////
-
-// Set up microgrid parameters.
+// CSV parser.
+const csv = require("fast-csv");
+const fs = require('fs');
 
 ///////////
 // Data. //
 ///////////
 
-// Load necessary data.
+// SunDance CSV format:
+// ["date", "use", "gen", "grid"].
+
+// Process each site.
+for (var i = 1; i <= 1; i++) {
+
+  // Filter missing sites.
+  if(i == 2 || i == 6) {
+    continue;
+  }
+
+  // File reader.
+  function readFile(i) {
+
+    // File name.
+    var file_name = '/Users/ParkerWild/github/p2p-energy-dapp/data/sundance/SunDance_' + i + '.csv';
+
+    // Log.
+    console.log("File name: " + file_name);
+
+    // Create read stream.
+    var stream = fs.createReadStream(file_name);
+
+    // Index & batch.
+    // let index = 0;
+    // let batch = 0;
+
+    // List of points at site.
+    var points = [];
+
+    // Create CSV stream.
+    var csvStream = csv().on("data", function(data){
+        // Data operations.
+        // ...
+
+        // Point.
+        let point = {
+          date: data[0],
+          use: data[1],
+          gen: data[2],
+          grid: data[3]
+        }
+
+        // Add to points.
+        points.push(point);
+
+      }).on("end", function(){
+        // Upon completion.
+        // ...
+
+        // Callback.
+        callback(points);
+      });
+
+    // Pipe.
+    stream.pipe(csvStream);
+  }
+
+  // Called upon completion of asynchronous "readFile()".
+  function callback(points) {
+    // Log.
+    // console.log(points);
+  }
+
+  // Read file.
+  readFile(i);
+}
+
+///////////
+// Grid. //
+///////////
+
+// Set up microgrid parameters.
 
 //////////
 // Bid. //
@@ -45,7 +115,7 @@ var nextAuctionString =
   nextHour + ":00.";
 
 // Log.
-console.log("Next auction: " + nextAuctionString);
+// console.log("Next auction: " + nextAuctionString);
 
 ///////////
 // Test. //

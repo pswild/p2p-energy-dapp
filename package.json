@@ -53,6 +53,7 @@
     "d3": "^5.8.0",
     "d3-fetch": "^1.1.2",
     "d3-request": "^1.0.6",
+    "fast-csv": "^2.4.1",
     "papaparse": "^4.6.3",
     "react": "^15.4.2",
     "react-bootstrap": "^1.0.0-beta.5",
