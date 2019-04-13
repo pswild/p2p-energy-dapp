@@ -4,10 +4,6 @@
 // Contracts.
 var Auction = artifacts.require("./Auction.sol");
 
-// D3 JavaScript.
-const D3 = require("d3");
-
-
 ///////////
 // Grid. //
 ///////////
@@ -18,84 +14,17 @@ const D3 = require("d3");
 // Data. //
 ///////////
 
-// Log.
-console.log("Loading SunDance data: ");
-
-// List of sites.
-var sites = [];
-
-// Process each site.
-for (var i = 0; i <= 0; i++) {
-  // Filter missing sites.
-  if(i == 2 || i == 6) {
-    continue
-  }
-
-  // Site name.
-  var site_name = '../data/sundance/SunDance_' + i + '.csv';
-
-  // NOTE: Site name is not being passed to asynchronous function.
-
-  // Load site data.
-  const csv = require('../data/sundance/SunDance_' + i + '.csv');
-
-  // Parse CSV files.
-  D3.csv(csv).then(function(csv) {
-    // List of points at site.
-    var points = [];
-
-    // Read each line of CSV (skip header).
-    for (var j = 1; j < csv.length; j++) {
-
-      // Create new date object.
-      var csvDate = csv[j].date.split(" ");
-
-      var calendar = csvDate[0].split("/");
-      var period = csvDate[1].split(":");
-      var ampm = csvDate[2];
-
-      var year = "20" + calendar[2];
-      var month = calendar[0];
-      var day = calendar[1];
-
-      var hour = parseInt(period[0], 10);
-      if (ampm === "PM") {
-        hour += 12;
-      }
-
-      var date = new Date(year, month, day, hour);
-
-      // Point.
-      let point = {
-        date: date,
-        use: csv[j].use,
-        gen: csv[j].gen,
-        grid: csv[j].grid
-      }
-
-      // Add to points.
-      points.push(point);
-    }
-
-    // Return.
-    return points;
-  }).then(function(points) {
-    // Site.
-    let site = {
-      name: "",
-      points: points
-    }
-    // Add to sites.
-    sites.push(site);
-  })
-}
-
-// Log.
-// console.log(sites);
+// Load necessary data.
 
 //////////
 // Bid. //
 //////////
+
+// Ascertain bids of each user.
+
+//////////////
+// Auction. //
+//////////////
 
 // Current date and time.
 var current = new Date();
@@ -115,22 +44,27 @@ var nextAuctionString =
   currentYear + " at " +
   nextHour + ":00.";
 
-// Ascertain bids of each user.
+// Log.
+console.log("Next auction: " + nextAuctionString);
 
 ///////////
 // Test. //
 ///////////
 
-contract('Auction', function (accounts) {
+contract('Microgrid', function (accounts) {
 
   it("...testing the microgrid.", function() {
+    // Wait until contract is deployed.
     return Auction.deployed().then(function(instance) {
+      // Contract instance.
       auctionInstance = instance;
-
-      return auctionInstance.bid(5, {from: accounts[0]});
+      // Send bid.
+      return auctionInstance.bid(5, {from: accounts[0]} );
     }).then(function() {
+      // Get bid.
       return auctionInstance.get.call();
     }).then(function(value) {
+      // Assert equal.
       assert.equal(value, 5, "The microgrid test failed.");
     });
   });
