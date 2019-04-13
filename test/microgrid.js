@@ -15,6 +15,9 @@ const fs = require('fs');
 // SunDance CSV format:
 // ["date", "use", "gen", "grid"].
 
+// List of sites.
+var sites = [];
+
 // Process each site.
 for (var i = 1; i <= 100; i++) {
 
@@ -23,14 +26,14 @@ for (var i = 1; i <= 100; i++) {
     continue;
   }
 
+  // File name.
+  var file_name = '/Users/ParkerWild/github/p2p-energy-dapp/data/sundance/SunDance_' + i + '.csv';
+
+  // Log.
+  // console.log("File name: " + file_name);
+
   // File reader.
-  function readFile(i) {
-
-    // File name.
-    var file_name = '/Users/ParkerWild/github/p2p-energy-dapp/data/sundance/SunDance_' + i + '.csv';
-
-    // Log.
-    console.log("File name: " + file_name);
+  function readFile(file_name) {
 
     // Create read stream.
     var stream = fs.createReadStream(file_name);
@@ -62,22 +65,25 @@ for (var i = 1; i <= 100; i++) {
         // Upon completion.
         // ...
 
-        // Callback.
-        callback(points);
+        // Log.
+        // console.log(points);
+
+        // Site.
+        let site = {
+          name: file_name,
+          points: points
+        }
+
+        // Add to sites.
+        sites.push(site);
       });
 
     // Pipe.
     stream.pipe(csvStream);
   }
 
-  // Called upon completion of asynchronous "readFile()".
-  function callback(points) {
-    // Log.
-    // console.log(points);
-  }
-
   // Read file.
-  readFile(i);
+  readFile(file_name);
 }
 
 ///////////
