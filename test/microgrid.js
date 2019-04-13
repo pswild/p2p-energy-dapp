@@ -14,6 +14,12 @@ var promiseCSV = require('./promiseCSV.js');
 // SunDance CSV format:
 // ["date", "use", "gen", "grid"].
 
+// Log.
+console.log("Processing SunDance data.");
+
+// Sites.
+var sites = [];
+
 // Process each site.
 for (var i = 1; i <= 100; i++) {
 
@@ -30,7 +36,7 @@ for (var i = 1; i <= 100; i++) {
   var options = { 'headers': true };
 
   // Log.
-  console.log("File: " + file_name);
+  // console.log("File: " + file_name);
 
   // CSV parse with promise.
   promiseCSV(path + file_name, options).then(function (records) {
@@ -54,9 +60,21 @@ for (var i = 1; i <= 100; i++) {
       // Update records.
       records[j].date = dateObj;
     }
-    // Log.
-    // console.log(records);
+    // Add to sites.
+    sites.push(records);
+
+    // Callback.
+    if (sites.length == 98) {
+      runTests(sites);
+    }
   });
+}
+
+// Called when all data is processed.
+function runTests(sites) {
+  // Log.
+  // console.log(sites);
+  console.log("SunDance data processed.");
 }
 
 ///////////
