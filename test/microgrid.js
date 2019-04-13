@@ -18,7 +18,7 @@ var promiseCSV = require('./promiseCSV.js');
 var sites = [];
 
 // Process each site.
-for (var i = 1; i <= 1; i++) {
+for (var i = 1; i <= 100; i++) {
 
   // Filter missing sites.
   if(i == 2 || i == 6) {
@@ -38,7 +38,34 @@ for (var i = 1; i <= 1; i++) {
   // CSV parse with promise.
   promiseCSV(path + file_name, options).then(function (records) {
     // Log.
-    console.log(records[0]);
+    // console.log("Done processing " + file_name + ".");
+
+    // Format.
+    // ...
+
+    // For all points.
+    for (var j = 0; j < records.length; j++) {
+
+      // Create new date object.
+      var date = records[j].date.split(" ");
+
+      var calendar = date[0].split("/");
+      var period = date[1].split(":");
+
+      var year = "20" + calendar[2] - 1;
+      var month = calendar[0];
+      var day = calendar[1];
+
+      var hour = parseInt(period[0], 10);
+
+      var dateObj = new Date(year, month, day, hour);
+
+      // Update records.
+      records[j].date = dateObj;
+    }
+
+    // Log.
+    // console.log(records);
   });
 }
 
