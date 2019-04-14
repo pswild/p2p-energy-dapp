@@ -5,7 +5,7 @@ import * as D3 from "d3"
 import * as ReactD3 from 'react-d3'
 
 // Load SunDance data.
-import sundance from '../../../data/sundance/SunDance_4.csv'
+import sundance from '../../../data/sundance/SunDance_1.csv'
 
 /////////////////////////
 // Data visualization. //
@@ -40,7 +40,7 @@ D3.csv(sundance).then(function(data) {
     var calendar = date[0].split("/");
     var period = date[1].split(":");
 
-    var year = "20" + calendar[2] - 1;
+    var year = "20" + calendar[2];
     var month = calendar[0];
     var day = calendar[1];
 
@@ -54,9 +54,9 @@ D3.csv(sundance).then(function(data) {
     var diff = invar - outvar;
 
     // Add data points.
-    use.push({x: i, y: outvar});
-    gen.push({x: i, y: invar});
-    net.push({x: i, y: diff});
+    use.push({x: dateObj, y: outvar});
+    gen.push({x: dateObj, y: invar});
+    net.push({x: dateObj, y: diff});
   }
 
   // Update usage graph.
@@ -112,7 +112,8 @@ class Dashboard extends Component {
               yOrientation='right'
               margin={{top: 10, bottom: 50, left: 50, right: 10}}
               xAxis={{label: "Time"}}
-              yAxis={{label: "kW"}}/>
+              yAxis={{label: "kW"}}
+              xAxisTickInterval={{unit: 'month', interval: 2}}/>
 
             <h3>Energy Production</h3>
             <p>Display energy production graph here.</p>
@@ -123,7 +124,8 @@ class Dashboard extends Component {
               yOrientation='right'
               margin={{top: 10, bottom: 50, left: 50, right: 10}}
               xAxis={{label: "Time"}}
-              yAxis={{label: "kW"}}/>
+              yAxis={{label: "kW"}}
+              xAxisTickInterval={{unit: 'month', interval: 2}}/>
 
             <h3>Net Metering</h3>
             <p>Display net metering graph here.</p>
