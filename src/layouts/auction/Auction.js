@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 
 // UI Components
 import AuctionForm from './AuctionForm.js'
+import AuctionButtonContainer from '../ui/auctionbutton/AuctionButtonContainer.js'
 
 // Current date and time.
 var current = new Date();
@@ -49,10 +50,11 @@ class Auction extends Component {
           <p>The next auction will run on {nextAuctionString}</p>
 
           <h2>Make a Bid</h2>
-          <AuctionForm></AuctionForm>
+          <AuctionForm />
 
           <h2>End an Auction</h2>
           <p>See the auction results here.</p>
+          <AuctionButtonContainer />
         </div>
       </div>
     </main>

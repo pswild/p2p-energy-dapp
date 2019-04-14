@@ -1,6 +1,6 @@
 import { connect } from 'react-redux'
-import TestButton from './TestButton'
-import { test } from './TestButtonActions'
+import AuctionButton from './AuctionButton'
+import { auction } from './AuctionButtonActions'
 
 const mapStateToProps = (state, ownProps) => {
   return {}
@@ -11,14 +11,14 @@ const mapDispatchToProps = (dispatch) => {
     onTestClick: (event) => {
       event.preventDefault();
 
-      dispatch(test())
+      dispatch(auction())
     }
   }
 }
 
-const TestButtonContainer = connect(
+const AuctionButtonContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(TestButton)
+)(AuctionButton)
 
-export default TestButtonContainer
+export default AuctionButtonContainer
