@@ -2,7 +2,11 @@ import React, { Component } from 'react'
 
 // D3.
 import * as D3 from "d3"
+// React D3.
 import * as ReactD3 from 'react-d3'
+
+// UI Components
+import UsageChart from './UsageChart.js'
 
 // Load SunDance data.
 import sundance from '../../../data/sundance/SunDance_1.csv'
@@ -27,6 +31,8 @@ var use = [];
 var gen = [];
 // Net data.
 var net = [];
+// Synchronized data.
+var synch = [];
 
 // Parse CSV file.
 D3.csv(sundance).then(function(data) {
@@ -48,6 +54,9 @@ D3.csv(sundance).then(function(data) {
 
     var dateObj = new Date(year, month, day, hour);
 
+    // Date format.
+    var ms = +dateObj;
+
     // Calculations.
     var outvar = data[i].use.replace(/-|\s/g,"");
     var invar = data[i].gen.replace(/-|\s/g,"");
@@ -57,6 +66,7 @@ D3.csv(sundance).then(function(data) {
     use.push({x: dateObj, y: outvar});
     gen.push({x: dateObj, y: invar});
     net.push({x: dateObj, y: diff});
+    synch.push({date: ms, use: outvar, gen: invar});
   }
 
   // Update usage graph.
@@ -111,8 +121,8 @@ class Dashboard extends Component {
               height={400}
               yOrientation='right'
               margin={{top: 10, bottom: 50, left: 50, right: 10}}
-              xAxis={{label: "Time"}}
-              yAxis={{label: "kW"}}
+              xAxis={{label: 'Time'}}
+              yAxis={{label: 'kWh'}}
               xAxisTickInterval={{unit: 'month', interval: 2}}/>
 
             <h3>Energy Production</h3>
@@ -123,8 +133,8 @@ class Dashboard extends Component {
               height={400}
               yOrientation='right'
               margin={{top: 10, bottom: 50, left: 50, right: 10}}
-              xAxis={{label: "Time"}}
-              yAxis={{label: "kW"}}
+              xAxis={{label: 'Time'}}
+              yAxis={{label: 'kW'}}
               xAxisTickInterval={{unit: 'month', interval: 2}}/>
 
             <h3>Net Metering</h3>
