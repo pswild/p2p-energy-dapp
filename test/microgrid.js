@@ -73,10 +73,7 @@ for (var i = 1; i <= 100; i++) {
 // Called when all data is processed.
 function runTests(sites) {
   // Log.
-  // console.log(sites);
   console.log("SunDance data processed.");
-
-  
 }
 
 ///////////

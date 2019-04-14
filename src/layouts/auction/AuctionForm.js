@@ -49,7 +49,10 @@ class AuctionForm extends Component {
 
       // Set web3, accounts, and contract to the state. Call runExample.
       this.setState(
-        { web3, contract: instance },
+        {
+          web3,
+          contract: instance
+        },
         this.runExample
       );
     } catch (error) {
@@ -66,10 +69,13 @@ class AuctionForm extends Component {
     });
   }
 
-  // Test contract.
+  // Submit bid.
   async handleSubmit(event) {
     // Prevent page reload.
     event.preventDefault();
+
+    // Log.
+    console.log("Bid submitted.");
 
     // Get state.
     const {
@@ -97,15 +103,21 @@ class AuctionForm extends Component {
     });
   }
 
-  // Run example.
+  // End auction.
+  results() {
+    // Log.
+    console.log("Auction results requested.");
+  }
+
+  // Called after component mounts.
   async runExample() {
     try  {
-
-      // Test.
+      // Log.
+      console.log("Auction initialized.")
 
     } catch (error) {
       // Throw error.
-      alert(`Failed to load example.`);
+      alert(`Failed to run example function.`);
       console.error(error);
     }
   }
@@ -118,16 +130,31 @@ class AuctionForm extends Component {
 
     return (
 
-      <form onSubmit={this.handleSubmit}>
-        <p>Input bid ($): </p>
-        <label>
-          <input type="text" value={this.state.value} onChange={this.handleChange} />
-        </label>
-        <input type="submit" value="Submit" />
-        <p></p>
-        <div>The bid is: {this.state.bid}</div>
-        <div>The bidder is: {this.state.bidder}</div>
-      </form>
+      <div>
+
+        <h2>Start an Auction</h2>
+        <p>The next auction will run on {this.props.nextAuctionString}</p>
+
+        <h2>Make a Bid</h2>
+        <p>Input bid ($) here.</p>
+
+          <form onSubmit={this.handleSubmit}>
+            <label>
+              <input type="text" value={this.state.value} onChange={this.handleChange} />
+            </label>
+            <input type="submit" value="Submit" />
+            <div>
+              <p>The bid is: {this.state.bid}</p>
+              <p>The bidder is: {this.state.bidder}</p>
+            </div>
+          </form>
+
+        <h2>End an Auction</h2>
+        <p>See the auction results here.</p>
+
+        <button onClick={() => {this.results()}}>End Auction</button>
+
+      </div>
 
     );
   }

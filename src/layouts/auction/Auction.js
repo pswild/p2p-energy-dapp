@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 
 // UI Components
 import AuctionForm from './AuctionForm.js'
-import AuctionButtonContainer from '../ui/auctionbutton/AuctionButtonContainer.js'
 
 ////////////
 // Setup. //
@@ -42,7 +41,7 @@ for (var i = 0; i < 10; i++) {
 }
 
 // Log.
-console.log(users);
+// console.log(users);
 
 // Battery capacities (Tesla Powerwall 2): kWh.
 const capacity = 13.5;
@@ -101,15 +100,8 @@ class Auction extends Component {
           <h1>Auction</h1>
           <p><i>Specify your auction preferences here.</i></p>
 
-          <h2>Start an Auction</h2>
-          <p>The next auction will run on {nextAuctionString}</p>
+          <AuctionForm nextAuctionString={nextAuctionString}/>
 
-          <h2>Make a Bid</h2>
-          <AuctionForm />
-
-          <h2>End an Auction</h2>
-          <p>See the auction results here.</p>
-          <AuctionButtonContainer />
         </div>
       </div>
     </main>
