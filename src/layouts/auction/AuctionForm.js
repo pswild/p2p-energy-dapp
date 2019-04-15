@@ -82,12 +82,6 @@ var nextAuctionString =
 // Log.
 // console.log("Next auction: " + nextAuctionString);
 
-///////////////
-// MetaMask. //
-///////////////
-
-// Update MetaMask account on change.
-
 ///////////////////
 // Auction form. //
 ///////////////////
@@ -95,9 +89,6 @@ var nextAuctionString =
 class AuctionForm extends Component {
   constructor(props) {
     super(props);
-
-    // Set props.
-    // ...
 
     // Set state.
     this.state = {

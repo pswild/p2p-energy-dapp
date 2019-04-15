@@ -12,6 +12,10 @@ import './css/open-sans.css'
 import './css/pure-min.css'
 import './App.css'
 
+//////////
+// App. //
+//////////
+
 class App extends Component {
 
   constructor(props){
