@@ -94,7 +94,6 @@ class AuctionForm extends Component {
     this.state = {
       value: "",
       bid: "[No bids have been submitted.]",
-      bidder: "[No bidders have bidded.]",
       web3: null,
       accounts: null,
       contract: null
@@ -172,12 +171,9 @@ class AuctionForm extends Component {
       contract
     } = this.state;
 
-    // Use web3 to get the user's accounts.
-    const accounts = await this.state.web3.eth.getAccounts();
-
     // Stores a given value.
     await contract.methods.set(this.state.value).send({
-      from: accounts[0]
+      from: this.state.accounts[0]
     });
 
     // Get the value from the contract to prove it worked.
@@ -185,9 +181,7 @@ class AuctionForm extends Component {
 
     // Set state.
     this.setState({
-      accounts: accounts,
-      bid: response,
-      bidder: accounts[0]
+      bid: response
     });
   }
 
@@ -240,6 +234,9 @@ class AuctionForm extends Component {
 
       <div>
 
+        <h2>Account Details</h2>
+        <p>Ethereum address: {this.state.accounts[0]}</p>
+
         <h2>Start an Auction</h2>
         <p>The next auction will run on {nextAuctionString}</p>
 
@@ -252,8 +249,7 @@ class AuctionForm extends Component {
             </label>
             <input type="submit" value="Submit" />
             <div>
-              <p>The bid is: {this.state.bid}</p>
-              <p>The bidder is: {this.state.bidder}</p>
+              <p>Bid: {this.state.bid}</p>
             </div>
           </form>
 
