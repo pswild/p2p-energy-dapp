@@ -15,7 +15,8 @@ class Profile extends Component {
     this.state = {
       mounted: null,
       web3: null,
-      accounts: null
+      accounts: null,
+      balance: null,
     };
 
     // uPort authentication information.
@@ -37,8 +38,14 @@ class Profile extends Component {
       // Enable MetaMask.
       await web3.currentProvider.enable();
 
-      // Use web3 to get the user's accounts.
+      // Use web3 to get the user's account.
       const accounts = await web3.eth.getAccounts();
+
+      // Use web3 to get the user's balance.
+      await web3.eth.getBalance(accounts[0], (err, balance) => {
+        balance = web3.utils.fromWei(balance, "ether") + " ETH";
+        this.setState({ balance });
+      }).bind(this);
 
       // MetaMask account change.
       var selected = accounts[0];
@@ -52,6 +59,12 @@ class Profile extends Component {
         if (accounts[0] !== selected) {
           // Log.
           console.log("MetaMask account changed.");
+
+          // Get balance.
+          await web3.eth.getBalance(accounts[0], (err, balance) => {
+            balance = web3.utils.fromWei(balance, "ether") + " ETH";
+            this.setState({ balance });
+          }).bind(this);
 
           // Update state.
           selected = accounts[0];
@@ -123,13 +136,8 @@ class Profile extends Component {
             </p>
 
             <p>
-              <strong><i>Network Address</i></strong><br />
-              {this.props.authData.networkAddress}<br />
-            </p>
-
-            <p>
-              <strong><i>Public Key</i></strong><br />
-              {this.props.authData.publicEncKey}<br />
+              <strong><i>Account Balance</i></strong><br />
+              {this.state.balance}<br />
             </p>
 
             <h2>Grid Statistics</h2>
