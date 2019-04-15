@@ -92,11 +92,12 @@ class AuctionForm extends Component {
 
     // Set state.
     this.state = {
-      value: "",
-      bid: "[No bids have been submitted.]",
+      mounted: null,
       web3: null,
       accounts: null,
-      contract: null
+      contract: null,
+      value: "",
+      bid: "[No bids have been submitted.]"
     };
 
     // Handle changes.
@@ -104,8 +105,11 @@ class AuctionForm extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  // Load contract.
+  // Load Web3.
   async componentDidMount() {
+    // Register mounted.
+    this.mounted = true;
+
     try {
       // Web3.
       var web3 = window.web3;
@@ -116,25 +120,25 @@ class AuctionForm extends Component {
       // Enable MetaMask.
       await web3.currentProvider.enable();
 
-      // NOTE: Acquire confirmation from the MetaMask account that this
-      // application may view Ethereum addresses.
-
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
-
-      // Note: accounts is only populated by the default address selected in
-      // MetaMask. This can be accessed at "accounts[0]".
 
       // MetaMask account change.
       var selected = accounts[0];
       var accountInterval = setInterval(async function() {
+        // Stop if unmounted.
+        if (!this.mounted) {
+          clearInterval(accountInterval);
+        }
+        // Monitor changes.
         accounts = await web3.eth.getAccounts();
         if (accounts[0] !== selected) {
+          // Log.
+          console.log("MetaMask account changed.");
+
+          // Update state.
           selected = accounts[0];
-          this.setState(
-            { accounts },
-            this.updateInterface
-          );
+          this.setState({ accounts });
         }
       }.bind(this), 100);
 
@@ -146,16 +150,22 @@ class AuctionForm extends Component {
         deployedNetwork && deployedNetwork.address,
       );
 
-      // Set web3, accounts, and contract to the state. Call runExample.
+      // Set web3, accounts, and contract to the state.
       this.setState(
         { web3, accounts, contract: instance },
-        this.initialize
+        this.initalize
       );
     } catch (error) {
       // Throw error.
       alert(`Failed to load web3, accounts, or contract.`);
       console.error(error);
     }
+  }
+
+  // Prepare to unmount.
+  componentWillUnmount() {
+    // Register unmount.
+    this.mounted = false;
   }
 
   // Submit bid.
@@ -192,12 +202,6 @@ class AuctionForm extends Component {
     });
   }
 
-  // MetaMask account changed.
-  updateInterface() {
-    // Log.
-    console.log("MetaMask account changed.");
-  }
-
   // Initialize auction.
   async initialize() {
     try  {
@@ -225,6 +229,7 @@ class AuctionForm extends Component {
   }
 
   render() {
+
     // Handle loading issues.
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
