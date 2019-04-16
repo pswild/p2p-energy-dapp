@@ -138,7 +138,9 @@ class AuctionForm extends Component {
 
           // Update state.
           selected = accounts[0];
-          this.setState({ accounts });
+          this.setState({
+            accounts, value: "", bid: "[No bids have been submitted.]"
+          });
         }
       }.bind(this), 100);
 
