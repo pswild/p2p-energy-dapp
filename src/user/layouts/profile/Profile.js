@@ -104,44 +104,56 @@ class Profile extends Component {
             <p><strong>Congratulations, {this.props.authData.name}!</strong></p>
             <p>If you're seeing this page, you've logged in with uPort successfully. Navigate to your dashboard for more information.</p>
 
-            <h2>Contact Information</h2>
+            <div id="wrapper">
 
-            <p>Change these details in your uPort mobile app to see them reflected here.</p>
+              <div id="left">
 
-            <p>
-              <strong><i>Name</i></strong><br />
-              {this.props.authData.name}<br />
-            </p>
+                <h2>Contact Information</h2>
 
-            <p>
-              <strong><i>Email</i></strong><br />
-              {this.props.authData.email}<br />
-            </p>
+                <p>Change these details in your uPort mobile app.</p>
 
-            <p>
-              <strong><i>Phone</i></strong><br />
-              {this.props.authData.phone}<br />
-            </p>
+                <p>
+                  <strong><i>Name</i></strong><br />
+                  {this.props.authData.name}<br />
+                </p>
 
-            <p>
-              <strong><i>Location</i></strong><br />
-              {this.props.authData.country}<br />
-            </p>
+                <p>
+                  <strong><i>Email</i></strong><br />
+                  {this.props.authData.email}<br />
+                </p>
 
-            <h2>Ethereum Account</h2>
+                <p>
+                  <strong><i>Phone</i></strong><br />
+                  {this.props.authData.phone}<br />
+                </p>
 
-            <p>
-              <strong><i>Ethereum Address</i></strong><br />
-              {this.state.accounts[0]}<br />
-            </p>
+                <p>
+                  <strong><i>Location</i></strong><br />
+                  {this.props.authData.country}<br />
+                </p>
 
-            <p>
-              <strong><i>Account Balance</i></strong><br />
-              {this.state.balance}<br />
-            </p>
+              </div>
 
-            <h2>Grid Statistics</h2>
-            <p>Diplay information about the microgrid here.</p>
+              <div id="right">
+
+                <h2>Ethereum Account</h2>
+
+                <p>
+                  <strong><i>Ethereum Address</i></strong><br />
+                  {this.state.accounts[0]}<br />
+                </p>
+
+                <p>
+                  <strong><i>Account Balance</i></strong><br />
+                  {this.state.balance}<br />
+                </p>
+
+                <h2>Grid Statistics</h2>
+                <p>Diplay information about the microgrid here.</p>
+
+              </div>
+
+            </div>
 
           </div>
         </div>

@@ -34,6 +34,18 @@ pre {
   border-color: #0c1a2b;
 }
 
+#wrapper {
+  display: flex;
+}
+
+#left {
+  flex: 0 0 40%;
+}
+
+#right {
+  flex: 1;
+}
+
 /* NAVBAR */
 
 .navbar {

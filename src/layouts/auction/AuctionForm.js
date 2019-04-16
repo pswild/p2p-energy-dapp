@@ -242,78 +242,87 @@ class AuctionForm extends Component {
 
     return (
 
-      <div>
+      <div id="wrapper">
 
-        <h2>Account Details</h2>
-        <p>
-          <strong><i>Ethereum Address</i></strong><br />
-          {this.state.accounts[0]}<br />
-        </p>
+        <div id="left">
 
-        <h2>Start an Auction</h2>
-        <p>
-          <strong><i>Current Time</i></strong><br />
-          {this.state.time}<br />
-        </p>
+          <h2>Account Details</h2>
+          <p>
+            <strong><i>Ethereum Address</i></strong><br />
+            {this.state.accounts[0]}<br />
+          </p>
 
-        <p>
-          <strong><i>Current Auction</i></strong><br />
-          The auction period ends in {this.state.next} minutes.<br />
-        </p>
+          <h2>Start an Auction</h2>
+          <p>
+            <strong><i>Current Time</i></strong><br />
+            {this.state.time}<br />
+          </p>
 
-        <h2>Make a Bid</h2>
-        <p>Input bid ($) here.</p>
+          <p>
+            <strong><i>Current Auction</i></strong><br />
+            The auction period ends in {this.state.next} minutes.<br />
+          </p>
 
-          <form onSubmit={this.handleSubmit}>
-            <label>
-              <input type="text" value={this.state.value} onChange={this.handleChange} />
-            </label>
-            <input type="submit" value="Submit" />
-            <div>
-              <p>Bid: {this.state.bid}</p>
-            </div>
-          </form>
+          <h2>Make a Bid</h2>
+          <p>Input bid (¢/kWh) here.</p>
 
-        <h2>End an Auction</h2>
-        <p>See the auction results here.</p>
+            <form onSubmit={this.handleSubmit}>
+              <label>
+                <input type="text" value={this.state.value} onChange={this.handleChange} />
+              </label>
+              <input type="submit" value="Submit" />
+              <div>
+                <p>Bid: {this.state.bid}</p>
+              </div>
+            </form>
 
-        <button onClick={() => {this.finalize()}}>End Auction</button>
+          <h2>End an Auction</h2>
+          <p>See the auction results here.</p>
 
-        <h2>Statistics</h2>
-        <p>See data from the last auction period here.</p>
-        <p>
-          <strong><i>Electricity Consumption</i></strong><br />
-          {this.state.consumption}<br />
-        </p>
+          <button onClick={() => {this.finalize()}}>End Auction</button>
 
-        <p>
-          <strong><i>Electricity Production</i></strong><br />
-          {this.state.production}<br />
-        </p>
+        </div>
 
-        <p>
-          <strong><i>Storage Capacity</i></strong><br />
-          {capacity} kilowatt-hours.<br />
-        </p>
 
-        <p>See information about the microgrid here.</p>
+        <div id="right">
 
-        <p>
-          <strong><i>Number of Members</i></strong><br />
-          {microgrid}<br />
-        </p>
+          <h2>Statistics</h2>
+          <p>See data from the last auction period here.</p>
+          <p>
+            <strong><i>Electricity Consumption</i></strong><br />
+            {this.state.consumption}<br />
+          </p>
 
-        <p>See information about the utility provider here.</p>
+          <p>
+            <strong><i>Electricity Production</i></strong><br />
+            {this.state.production}<br />
+          </p>
 
-        <p>
-          <strong><i>Utility Rate</i></strong><br />
-          {utilityPrice} cents per kilowatt-hour.<br />
-        </p>
+          <p>
+            <strong><i>Storage Capacity</i></strong><br />
+            {capacity} kilowatt-hours.<br />
+          </p>
 
-        <p>
-          <strong><i>Buy-Back Rate</i></strong><br />
-          {buyBackRate} cents per kilowatt-hour.<br />
-        </p>
+          <p>See information about the microgrid here.</p>
+
+          <p>
+            <strong><i>Number of Members</i></strong><br />
+            {microgrid}<br />
+          </p>
+
+          <p>See information about the utility provider here.</p>
+
+          <p>
+            <strong><i>Utility Rate</i></strong><br />
+            {utilityPrice} cents per kilowatt-hour.<br />
+          </p>
+
+          <p>
+            <strong><i>Buy-Back Rate</i></strong><br />
+            {buyBackRate} cents per kilowatt-hour.<br />
+          </p>
+
+        </div>
 
       </div>
 
