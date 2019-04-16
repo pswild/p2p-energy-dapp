@@ -50,7 +50,7 @@ for (var i = 0; i < 10; i++) {
 const capacity = 13.5;
 
 // Microgrid statistics.
-var size = 10;
+var microgrid = 98;
 
 // Electricity statistics.
 var grossUsage = 0; // kWh.
@@ -58,8 +58,8 @@ var grossGeneration = 0; // kWh.
 var net = 0; // kWh.
 
 // Utility statistics: $/kWh.
-var utilityPrice = 10;
-var buyBackRate = 5;
+var utilityPrice = 12;
+var buyBackRate = 3;
 
 ///////////////////
 // Auction form. //
@@ -75,8 +75,12 @@ class AuctionForm extends Component {
       web3: null,
       accounts: null,
       contract: null,
+      consumption: null,
+      production: null,
+      capacity: null,
       time: null,
       next: null,
+
       value: "",
       bid: "[No bids have been submitted.]"
     };
@@ -274,6 +278,42 @@ class AuctionForm extends Component {
         <p>See the auction results here.</p>
 
         <button onClick={() => {this.finalize()}}>End Auction</button>
+
+        <h2>Statistics</h2>
+        <p>See data from the last auction period here.</p>
+        <p>
+          <strong><i>Electricity Consumption</i></strong><br />
+          {this.state.consumption}<br />
+        </p>
+
+        <p>
+          <strong><i>Electricity Production</i></strong><br />
+          {this.state.production}<br />
+        </p>
+
+        <p>
+          <strong><i>Storage Capacity</i></strong><br />
+          {capacity} kilowatt-hours.<br />
+        </p>
+
+        <p>See information about the microgrid here.</p>
+
+        <p>
+          <strong><i>Number of Members</i></strong><br />
+          {microgrid}<br />
+        </p>
+
+        <p>See information about the utility provider here.</p>
+
+        <p>
+          <strong><i>Utility Rate</i></strong><br />
+          {utilityPrice} cents per kilowatt-hour.<br />
+        </p>
+
+        <p>
+          <strong><i>Buy-Back Rate</i></strong><br />
+          {buyBackRate} cents per kilowatt-hour.<br />
+        </p>
 
       </div>
 

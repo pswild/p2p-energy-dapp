@@ -218,7 +218,7 @@ class Dashboard extends Component {
 
             <h2>Statistics</h2>
 
-            <h3>Energy Usage</h3>
+            <h3>Electricity Usage (kWh)</h3>
             <ReactD3.AreaChart
               data={this.state.usage}
               width={1400}
@@ -229,7 +229,7 @@ class Dashboard extends Component {
               yAxis={{label: 'kWh'}}
               xAxisTickInterval={{unit: 'month', interval: 2}}/>
 
-            <h3>Energy Production</h3>
+            <h3>Electricity Production (kWh)</h3>
             <ReactD3.AreaChart
               data={this.state.generation}
               width={1400}
@@ -240,7 +240,7 @@ class Dashboard extends Component {
               yAxis={{label: 'kW'}}
               xAxisTickInterval={{unit: 'month', interval: 2}}/>
 
-            <h3>Net Metering</h3>
+            <h3>Net Metering (kWh)</h3>
             <p>Display net metering graph here.</p>
 
             <h3>Storage Capacity</h3>
