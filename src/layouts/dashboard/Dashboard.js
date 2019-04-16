@@ -78,19 +78,20 @@ class Dashboard extends Component {
         // Stop if unmounted.
         if (!this.mounted) {
           clearInterval(accountInterval);
-        }
-        // Monitor changes.
-        accounts = await web3.eth.getAccounts();
-        if (accounts[0] !== selected) {
-          // Log.
-          console.log("MetaMask account changed.");
+        } else  {
+          // Monitor changes.
+          accounts = await web3.eth.getAccounts();
+          if (accounts[0] !== selected) {
+            // Log.
+            console.log("MetaMask account changed.");
 
-          selected = accounts[0];
-          var user = users.get(selected);
-          this.setState(
-            { accounts, usage: null, generation: null, netmeter: null },
-            this.process
-          );
+            selected = accounts[0];
+            var user = users.get(selected);
+            this.setState(
+              { accounts, usage: null, generation: null, netmeter: null },
+              this.process
+            );
+          }
         }
       }.bind(this), 100);
 
@@ -218,7 +219,6 @@ class Dashboard extends Component {
             <h2>Statistics</h2>
 
             <h3>Energy Usage</h3>
-            <p>Display energy usage graph here.</p>
             <ReactD3.AreaChart
               data={this.state.usage}
               width={1400}
@@ -230,7 +230,6 @@ class Dashboard extends Component {
               xAxisTickInterval={{unit: 'month', interval: 2}}/>
 
             <h3>Energy Production</h3>
-            <p>Display energy production graph here.</p>
             <ReactD3.AreaChart
               data={this.state.generation}
               width={1400}

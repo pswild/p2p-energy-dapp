@@ -61,27 +61,6 @@ var net = 0; // kWh.
 var utilityPrice = 10;
 var buyBackRate = 5;
 
-// Current date and time.
-var current = new Date();
-var currentYear = current.getFullYear();
-var currentMonth = current.getMonth() + 1;
-var currentDay = current.getDate();
-var currentHour = current.getHours();
-var currentMinute = current.getMinutes();
-var currentSecond = current.getSeconds();
-
-// Auction period: [year, month, day, hour].
-var nextHour = currentHour + 1;
-var nextAuction = [currentYear, currentMonth, currentDay, nextHour];
-var nextAuctionString =
-  currentMonth + "/" +
-  currentDay + "/" +
-  currentYear + " at " +
-  nextHour + ":00.";
-
-// Log.
-// console.log("Next auction: " + nextAuctionString);
-
 ///////////////////
 // Auction form. //
 ///////////////////
@@ -96,6 +75,8 @@ class AuctionForm extends Component {
       web3: null,
       accounts: null,
       contract: null,
+      time: null,
+      next: null,
       value: "",
       bid: "[No bids have been submitted.]"
     };
@@ -109,6 +90,20 @@ class AuctionForm extends Component {
   async componentDidMount() {
     // Register mounted.
     this.mounted = true;
+
+    // Current time.
+    var timeInterval = setInterval(async function() {
+      // Stop if unmounted.
+      if (!this.mounted) {
+        clearInterval(timeInterval);
+      } else {
+        // Update state.
+        this.setState({
+          time: new Date().toLocaleString(),
+          next: 60 - new Date().getMinutes()
+        });
+      }
+    }.bind(this), 100);
 
     try {
       // Web3.
@@ -129,18 +124,19 @@ class AuctionForm extends Component {
         // Stop if unmounted.
         if (!this.mounted) {
           clearInterval(accountInterval);
-        }
-        // Monitor changes.
-        accounts = await web3.eth.getAccounts();
-        if (accounts[0] !== selected) {
-          // Log.
-          console.log("MetaMask account changed.");
+        } else {
+          // Monitor changes.
+          accounts = await web3.eth.getAccounts();
+          if (accounts[0] !== selected) {
+            // Log.
+            console.log("MetaMask account changed.");
 
-          // Update state.
-          selected = accounts[0];
-          this.setState({
-            accounts, value: "", bid: "[No bids have been submitted.]"
-          });
+            // Update state.
+            selected = accounts[0];
+            this.setState({
+              accounts, value: "", bid: "[No bids have been submitted.]"
+            });
+          }
         }
       }.bind(this), 100);
 
@@ -236,16 +232,30 @@ class AuctionForm extends Component {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
+    if (!this.state.time) {
+      return <div>Loading current time...</div>;
+    }
 
     return (
 
       <div>
 
         <h2>Account Details</h2>
-        <p>Ethereum address: {this.state.accounts[0]}</p>
+        <p>
+          <strong><i>Ethereum Address</i></strong><br />
+          {this.state.accounts[0]}<br />
+        </p>
 
         <h2>Start an Auction</h2>
-        <p>The next auction will run on {nextAuctionString}</p>
+        <p>
+          <strong><i>Current Time</i></strong><br />
+          {this.state.time}<br />
+        </p>
+
+        <p>
+          <strong><i>Current Auction</i></strong><br />
+          The auction period ends in {this.state.next} minutes.<br />
+        </p>
 
         <h2>Make a Bid</h2>
         <p>Input bid ($) here.</p>

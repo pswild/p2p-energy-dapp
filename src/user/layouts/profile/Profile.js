@@ -53,22 +53,23 @@ class Profile extends Component {
         // Stop if unmounted.
         if (!this.mounted) {
           clearInterval(accountInterval);
-        }
-        // Monitor changes.
-        accounts = await web3.eth.getAccounts();
-        if (accounts[0] !== selected) {
-          // Log.
-          console.log("MetaMask account changed.");
+        } else {
+          // Monitor changes.
+          accounts = await web3.eth.getAccounts();
+          if (accounts[0] !== selected) {
+            // Log.
+            console.log("MetaMask account changed.");
 
-          // Get balance.
-          await web3.eth.getBalance(accounts[0], (err, balance) => {
-            balance = web3.utils.fromWei(balance, "ether") + " ETH";
-            this.setState({ balance });
-          }).bind(this);
+            // Get balance.
+            await web3.eth.getBalance(accounts[0], (err, balance) => {
+              balance = web3.utils.fromWei(balance, "ether") + " ETH";
+              this.setState({ balance });
+            }).bind(this);
 
-          // Update state.
-          selected = accounts[0];
-          this.setState({ accounts });
+            // Update state.
+            selected = accounts[0];
+            this.setState({ accounts });
+          }
         }
       }.bind(this), 100);
 
@@ -128,7 +129,6 @@ class Profile extends Component {
             </p>
 
             <h2>Ethereum Account</h2>
-            <p>Display current Ether balance here.</p>
 
             <p>
               <strong><i>Ethereum Address</i></strong><br />
