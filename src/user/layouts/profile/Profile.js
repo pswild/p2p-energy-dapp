@@ -112,8 +112,12 @@ class Profile extends Component {
           <div className="pure-u-1-1">
             <h1>Profile</h1>
 
-            <p><strong>Congratulations, {this.props.authData.name}!</strong></p>
-            <p>If you're seeing this page, you've logged in with uPort successfully. Navigate to your dashboard for more information.</p>
+            <p>
+              <strong>Welcome, {this.props.authData.name}!</strong>
+            </p>
+            <p>
+              Navigate to the <strong>Dashboard</strong> tab to view your past production and consumption, or the <strong>Auction</strong> tab to buy and sell electricity.
+            </p>
 
             <div id="wrapper">
 
@@ -121,7 +125,7 @@ class Profile extends Component {
 
                 <h2>Contact Information</h2>
 
-                <p>Change these details in your uPort mobile app.</p>
+                <p>You may change these details in your uPort mobile app.</p>
 
                 <p>
                   <strong><i>Name</i></strong><br />
@@ -159,11 +163,11 @@ class Profile extends Component {
                   {this.state.balance}<br />
                 </p>
 
-                <h2>Grid Statistics</h2>
+                <h2>Grid Configuration</h2>
                 <p>See information about the microgrid here.</p>
 
                 <p>
-                  <strong><i>Microgrid Membership</i></strong><br />
+                  <strong><i>Community Membership</i></strong><br />
                   {microgrid} users.<br />
                 </p>
 
