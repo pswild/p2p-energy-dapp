@@ -66,10 +66,13 @@ class AuctionForm extends Component {
         clearInterval(timeInterval);
       } else {
         // Update state.
-        this.setState({
-          time: new Date().toLocaleString(),
-          next: 60 - new Date().getMinutes()
-        });
+        this.setState(
+          {
+            time: new Date().toLocaleString(),
+            next: 60 - new Date().getMinutes()
+          },
+          this.process
+        );
       }
     }.bind(this), 100);
 
@@ -318,8 +321,10 @@ class AuctionForm extends Component {
 
           <p>
             <strong><i>Current Auction</i></strong><br />
-            The auction period ends in {this.state.next} minutes.<br />
+            The auction period ends in {this.state.next} minute(s).<br />
           </p>
+
+          <button onClick={() => {this.initialize()}}>Start Auction</button>
 
           <h2>Make a Bid</h2>
           <p>Input bid (¢/kWh) here.</p>
@@ -348,12 +353,12 @@ class AuctionForm extends Component {
           <p>See data from the last auction period here.</p>
           <p>
             <strong><i>Electricity Consumption</i></strong><br />
-            {this.state.consumption} kWh<br />
+            {this.state.consumption} kilowatt-hours<br />
           </p>
 
           <p>
             <strong><i>Electricity Production</i></strong><br />
-            {this.state.production} kWh<br />
+            {this.state.production} kilowatt-hours<br />
           </p>
 
           <p>
