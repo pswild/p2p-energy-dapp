@@ -3,6 +3,17 @@ import React, { Component } from 'react'
 // Web3.
 import Web3 from 'web3'
 
+////////////
+// Setup. //
+////////////
+
+// Microgrid statistics.
+var microgrid = 98;
+
+// Utility statistics: $/kWh.
+var utilityRate = 12;
+var buyBackRate = 3;
+
 //////////////
 // Profile. //
 //////////////
@@ -149,7 +160,22 @@ class Profile extends Component {
                 </p>
 
                 <h2>Grid Statistics</h2>
-                <p>Diplay information about the microgrid here.</p>
+                <p>See information about the microgrid here.</p>
+
+                <p>
+                  <strong><i>Microgrid Membership</i></strong><br />
+                  {microgrid} users.<br />
+                </p>
+
+                <p>
+                  <strong><i>Utility Rate</i></strong><br />
+                  {utilityRate} cents per kilowatt-hour.<br />
+                </p>
+
+                <p>
+                  <strong><i>Buy-Back Rate</i></strong><br />
+                  {buyBackRate} cents per kilowatt-hour.<br />
+                </p>
 
               </div>
 

@@ -16,9 +16,6 @@ import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
 // Battery capacities (Tesla Powerwall 2): kWh.
 const capacity = 13.5;
 
-// Microgrid statistics.
-var microgrid = 98;
-
 // Utility statistics: $/kWh.
 var utilityRate = 12;
 var buyBackRate = 3;
@@ -307,12 +304,6 @@ class AuctionForm extends Component {
 
         <div id="left">
 
-          <h2>Account Details</h2>
-          <p>
-            <strong><i>Ethereum Address</i></strong><br />
-            {this.state.accounts[0]}<br />
-          </p>
-
           <h2>Start an Auction</h2>
           <p>
             <strong><i>Current Time</i></strong><br />
@@ -349,6 +340,12 @@ class AuctionForm extends Component {
 
         <div id="right">
 
+          <h2>Account Details</h2>
+          <p>
+            <strong><i>Ethereum Address</i></strong><br />
+            {this.state.accounts[0]}<br />
+          </p>
+
           <h2>Statistics</h2>
           <p>See data from the last auction period here.</p>
           <p>
@@ -364,13 +361,6 @@ class AuctionForm extends Component {
           <p>
             <strong><i>Storage Capacity</i></strong><br />
             {capacity} kilowatt-hours.<br />
-          </p>
-
-          <p>See information about the microgrid here.</p>
-
-          <p>
-            <strong><i>Microgrid Membership</i></strong><br />
-            {microgrid} users.<br />
           </p>
 
           <p>See information about the utility provider here.</p>
