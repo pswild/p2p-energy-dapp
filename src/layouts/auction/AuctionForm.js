@@ -13,10 +13,12 @@ import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
 // Setup. //
 ////////////
 
-// Battery capacities (Tesla Powerwall 2): kWh.
+// Battery capacity: kWh.
+// (Tesla Powerwall 2).
 const capacity = 13.5;
 
-// Utility statistics: $/kWh.
+// Utility rates: $/kWh.
+// (Average U.S. statistics).
 var utilityRate = 12;
 var buyBackRate = 3;
 
@@ -30,18 +32,27 @@ class AuctionForm extends Component {
 
     // Set state.
     this.state = {
+      // Prevents unmounted state changes.
       mounted: null,
+      // Load Web3, accounts, and contract.
       web3: null,
       accounts: null,
       contract: null,
+      // Users and data.
       users: null,
       consumption: null,
       production: null,
       netmeter: null,
-      capacity: null,
+      level: 13.5,
+      capacity: capacity,
+      // Current time and date.
       time: null,
       next: null,
-
+      // Conditional rendering.
+      isConsumer: false,
+      isProducer: false,
+      isAuction: false,
+      // Event handling.
       value: "",
       bid: "[No bids have been submitted.]"
     };
@@ -160,6 +171,10 @@ class AuctionForm extends Component {
     this.mounted = false;
   }
 
+  ///////////
+  // Data. //
+  ///////////
+
   // Process data.
   async process() {
     try {
@@ -190,9 +205,18 @@ class AuctionForm extends Component {
             production = parseFloat(data[i].gen.replace(/-|\s/g,""));
             netmeter = production - consumption;
 
+            // Identify if consumer, producer, or both.
+            if (netmeter < 0 || this.state.level < this.state.capacity) {
+              this.setState({ isConsumer: true });
+            }
+            if (netmeter > 0 || this.state.level > 0) {
+              this.setState({ isProducer: true });
+            }
+
             // Round to two decimal places.
             consumption = consumption.toFixed(2);
             production = production.toFixed(2);
+            netmeter = netmeter.toFixed(2);
 
             // Break.
             break;
@@ -208,6 +232,10 @@ class AuctionForm extends Component {
       console.error(error);
     }
   }
+
+  /////////////////////
+  // Event handling. //
+  /////////////////////
 
   // Submit bid.
   async handleSubmit(event) {
@@ -254,10 +282,12 @@ class AuctionForm extends Component {
 
   handleChange(event) {
     // Set state.
-    this.setState({
-      value: event.target.value
-    });
+    this.setState({ value: event.target.value });
   }
+
+  //////////////
+  // Auction. //
+  //////////////
 
   // Initialize auction.
   async initialize() {
@@ -265,6 +295,8 @@ class AuctionForm extends Component {
       // Log.
       console.log("Auction initialized.")
 
+      // Set state.
+      this.setState({ isAuction: true });
     } catch (error) {
       // Throw error.
       alert(`Failed to initalize auction.`);
@@ -278,6 +310,8 @@ class AuctionForm extends Component {
       // Log.
       console.log("Auction finalized.");
 
+      // Set state.
+      this.setState({ isAuction: false });
     } catch (error) {
       // Throw error.
       alert(`Failed to finalize auction.`);
@@ -285,13 +319,14 @@ class AuctionForm extends Component {
     }
   }
 
+  // Render component.
   render() {
 
     // Handle loading issues.
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
-    if (!this.state.consumption || !this.state.production) {
+    if (!this.state.consumption || !this.state.production || !this.state.netmeter) {
       return <div>Loading data...</div>;
     }
     if (!this.state.time) {
@@ -304,7 +339,6 @@ class AuctionForm extends Component {
 
         <div id="left">
 
-          <h2>Start an Auction</h2>
           <p>
             <strong><i>Current Time</i></strong><br />
             {this.state.time}<br />
@@ -315,28 +349,80 @@ class AuctionForm extends Component {
             The auction period ends in {this.state.next} minute(s).<br />
           </p>
 
-          <button onClick={() => {this.initialize()}}>Start Auction</button>
+          <h2>Consumer Corner</h2>
 
-          <h2>Make a Bid</h2>
-          <p>Input bid (¢/kWh) here.</p>
+          {this.state.isConsumer ? (
 
-            <form onSubmit={this.handleSubmit}>
-              <label>
-                <input type="text" value={this.state.value} onChange={this.handleChange} />
-              </label>
-              <input type="submit" value="Submit" />
-              <div>
-                <p>Bid: {this.state.bid}</p>
-              </div>
-            </form>
+            <div>
 
-          <h2>End an Auction</h2>
-          <p>See the auction results here.</p>
+              <p>Purchase electricity to meet consumption or store for later.</p>
 
-          <button onClick={() => {this.finalize()}}>End Auction</button>
+              <h3>Make a Bid</h3>
+              <p>Input bid (¢/kWh) here.</p>
+
+                <form onSubmit={this.handleSubmit}>
+                  <label>
+                    <input type="text" value={this.state.value} onChange={this.handleChange} />
+                  </label>
+                  <input type="submit" value="Submit" />
+                  <div>
+                    <p>Bid: {this.state.bid}</p>
+                  </div>
+                </form>
+
+            </div>
+
+          ) : (
+
+            <div>
+
+              <p>You have no leftover capacity to store electricity.</p>
+
+            </div>
+
+          )}
+
+          <h2>Producer Corner</h2>
+
+          {this.state.isProducer ? (
+
+            <div>
+
+              <p>Sell excess electricity on the market.</p>
+
+              {!this.state.isAuction ? (
+                <div>
+
+                  <h3>Start an Auction</h3>
+                  <p>Set up an auction here.</p>
+
+                  <button onClick={() => {this.initialize()}}>Start Auction</button>
+
+                </div>
+              ) : (
+                <div>
+
+                  <h3>End an Auction</h3>
+                  <p>See the auction results here.</p>
+
+                  <button onClick={() => {this.finalize()}}>End Auction</button>
+
+                </div>
+              )}
+
+            </div>
+
+          ) : (
+
+            <div>
+
+              <p>You have no excess electricity to sell.</p>
+
+            </div>
+
+          )}
 
         </div>
-
 
         <div id="right">
 
@@ -358,13 +444,18 @@ class AuctionForm extends Component {
             {this.state.production} kilowatt-hours<br />
           </p>
 
+          <p>See current prosumer status and battery levels here.</p>
+          <p>
+            <strong><i>Net Production/Consumption</i></strong><br />
+            {this.state.netmeter} kilowatt-hours<br />
+          </p>
+
           <p>
             <strong><i>Storage Capacity</i></strong><br />
-            {capacity} kilowatt-hours.<br />
+            {this.state.level} of {this.state.capacity} kilowatt-hours.<br />
           </p>
 
           <p>See information about the utility provider here.</p>
-
           <p>
             <strong><i>Utility Rate</i></strong><br />
             {utilityRate} cents per kilowatt-hour.<br />
