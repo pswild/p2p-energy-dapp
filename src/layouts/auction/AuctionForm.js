@@ -13,9 +13,9 @@ import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
 // Setup. //
 ////////////
 
-// Battery capacity: kWh.
+// Battery storage capacity: kWh.
 // (Tesla Powerwall 2).
-const capacity = 13.5;
+const storageCapacity = 13.5;
 
 // Utility rates: $/kWh.
 // (Average U.S. statistics).
@@ -43,8 +43,8 @@ class AuctionForm extends Component {
       consumption: null,
       production: null,
       netmeter: null,
-      level: 13.5,
-      capacity: capacity,
+      batteryLevel: 13.5,
+      storageCapacity: storageCapacity,
       // Current time and date.
       time: null,
       next: null,
@@ -206,10 +206,10 @@ class AuctionForm extends Component {
             netmeter = production - consumption;
 
             // Identify if consumer, producer, or both.
-            if (netmeter < 0 || this.state.level < this.state.capacity) {
+            if (netmeter < 0 || this.state.batteryLevel < this.state.storageCapacity) {
               this.setState({ isConsumer: true });
             }
-            if (netmeter > 0 || this.state.level > 0) {
+            if (netmeter > 0 || this.state.batteryLevel > 0) {
               this.setState({ isProducer: true });
             }
 
@@ -451,8 +451,8 @@ class AuctionForm extends Component {
           </p>
 
           <p>
-            <strong><i>Battery Level</i></strong><br />
-            {this.state.level} of {this.state.capacity} kilowatt-hours.<br />
+            <strong><i>Battery Storage Level</i></strong><br />
+            {this.state.batteryLevel} of {this.state.storageCapacity} kilowatt-hours.<br />
           </p>
 
           <p>See information about the utility provider here.</p>
