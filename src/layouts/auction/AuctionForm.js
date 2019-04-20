@@ -325,7 +325,7 @@ class AuctionForm extends Component {
   render() {
 
     // Handle loading issues.
-    if (!this.state.web3) {
+    if (!this.state.web3 || !this.state.accounts || !this.state.contract) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
     if (!this.state.consumption || !this.state.production || !this.state.netmeter) {
