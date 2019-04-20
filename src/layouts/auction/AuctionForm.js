@@ -1,5 +1,8 @@
 import React, { Component } from 'react'
 
+// D3.
+import * as D3 from "d3"
+
 // Web3.
 import Web3 from 'web3'
 
@@ -10,55 +13,14 @@ import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
 // Setup. //
 ////////////
 
-// User object.
-function User(name, addr, data, use, gen, batt) {
-  this.name = name; // User name.
-  this.addr = addr; // Ethereum address.
-  this.data = data; // SunDance data file name.
-  this.use = use;   // Electricity usage for current time interval.
-  this.gen = gen;   // Electricity generation for current time
-  this.batt = batt; // Current battery level.
-}
-
-// Ethereum addresses hosted on Ganache.
-var addresses = [
-  "0x8E2077Ab0E6D14AF306106303d879d8b4F580e3f",
-  "0x301D2749B559BC9933b7bA85E5151f2b075DA5eB",
-  "0x4cE4f8F59B69474860d533191685edA6afA83B89",
-  "0x9956168BfD29AE6cadcDbe0A820b069f06Af5F7f",
-  "0xD73c86f2B6cbb14c01F4C634B461D20aa86BD7e1",
-  "0x3D43D1c22Ddd267AC0cE677AcA7c96f31b547234",
-  "0x42C8E0299Fd33b57Fa10628228bDfE1c6f013868",
-  "0x8328Bff14018a2Bd2498B5A04158ADb726185D60",
-  "0xfD2a5AFEE3A3c8C892Fed5A0CCfE705Fd06c6663",
-  "0x4917B088806dA204F406127520Cf06F8E82e17B9"
-];
-
-// Users.
-var users = [];
-for (var i = 0; i < 10; i++) {
-  // Create a new user.
-  users.push(
-    new User("user" + i, addresses[i], "SunDance_9" + i + ".csv", 0, 0, 0)
-  );
-}
-
-// Log.
-// console.log(users);
-
 // Battery capacities (Tesla Powerwall 2): kWh.
 const capacity = 13.5;
 
 // Microgrid statistics.
 var microgrid = 98;
 
-// Electricity statistics.
-var grossUsage = 0; // kWh.
-var grossGeneration = 0; // kWh.
-var net = 0; // kWh.
-
 // Utility statistics: $/kWh.
-var utilityPrice = 12;
+var utilityRate = 12;
 var buyBackRate = 3;
 
 ///////////////////
@@ -75,8 +37,10 @@ class AuctionForm extends Component {
       web3: null,
       accounts: null,
       contract: null,
+      users: null,
       consumption: null,
       production: null,
+      netmeter: null,
       capacity: null,
       time: null,
       next: null,
@@ -122,6 +86,28 @@ class AuctionForm extends Component {
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
 
+      // Ethereum addresses hosted on Ganache.
+      var addresses = [
+        "0x8E2077Ab0E6D14AF306106303d879d8b4F580e3f",
+        "0x301D2749B559BC9933b7bA85E5151f2b075DA5eB",
+        "0x4cE4f8F59B69474860d533191685edA6afA83B89",
+        "0x9956168BfD29AE6cadcDbe0A820b069f06Af5F7f",
+        "0xD73c86f2B6cbb14c01F4C634B461D20aa86BD7e1",
+        "0x3D43D1c22Ddd267AC0cE677AcA7c96f31b547234",
+        "0x42C8E0299Fd33b57Fa10628228bDfE1c6f013868",
+        "0x8328Bff14018a2Bd2498B5A04158ADb726185D60",
+        "0xfD2a5AFEE3A3c8C892Fed5A0CCfE705Fd06c6663",
+        "0x4917B088806dA204F406127520Cf06F8E82e17B9"
+      ];
+
+      // Map Ethereum addresses to SunDance data.
+      // [key, value]: [eth_addr, sundance_data]
+      var users = new Map();
+      for (var i = 0; i < 10; i++) {
+        var sundance = require('../../../data/sundance/SunDance_9' + i + '.csv');
+        users.set(addresses[i], sundance);
+      }
+
       // MetaMask account change.
       var selected = accounts[0];
       var accountInterval = setInterval(async function() {
@@ -137,9 +123,13 @@ class AuctionForm extends Component {
 
             // Update state.
             selected = accounts[0];
-            this.setState({
-              accounts, value: "", bid: "[No bids have been submitted.]"
-            });
+            this.setState(
+              {
+                accounts, consumption: "", production: "", netmeter: "",
+                value: "", bid: "[No bids have been submitted.]"
+              },
+              this.process
+            );
           }
         }
       }.bind(this), 100);
@@ -154,8 +144,8 @@ class AuctionForm extends Component {
 
       // Set web3, accounts, and contract to the state.
       this.setState(
-        { web3, accounts, contract: instance },
-        this.initalize
+        { web3, accounts, contract: instance, users },
+        this.process
       );
     } catch (error) {
       // Throw error.
@@ -170,31 +160,96 @@ class AuctionForm extends Component {
     this.mounted = false;
   }
 
+  // Process data.
+  async process() {
+    try {
+      // Current time and date.
+      var now = new Date();
+      var m = now.getMonth() + 1;
+      var d = now.getDate();
+      var h = now.getHours();
+
+      // Date string.
+      var current = m + "/" + d + "/15 " + h + ":00";
+
+      // Parse CSV file.
+      D3.csv(this.state.users.get(this.state.accounts[0])).then(function(data) {
+        // Consumption.
+        var consumption;
+        // Production.
+        var production;
+        // Net metering.
+        var netmeter;
+
+        // Read each line of CSV.
+        for (var i = 0; i < data.length; i++) {
+          // Find matching date.
+          if (data[i].date == current) {
+            // Correlate data.
+            consumption = parseFloat(data[i].use.replace(/-|\s/g,""));
+            production = parseFloat(data[i].gen.replace(/-|\s/g,""));
+            netmeter = production - consumption;
+
+            // Round to two decimal places.
+            consumption = consumption.toFixed(2);
+            production = production.toFixed(2);
+
+            // Break.
+            break;
+          }
+        }
+
+        // Set consumption and production to state.
+        this.setState({ consumption, production, netmeter} );
+      }.bind(this));
+    } catch (error) {
+      // Throw error.
+      alert(`Failed to load data.`);
+      console.error(error);
+    }
+  }
+
   // Submit bid.
   async handleSubmit(event) {
     // Prevent page reload.
     event.preventDefault();
 
-    // Log.
-    console.log("Bid submitted.");
+    // Only accept valid bids.
+    if (this.state.value < buyBackRate || this.state.value > utilityRate) {
+      // Log.
+      console.log("Invalid bid.");
 
-    // Get state.
-    const {
-      contract
-    } = this.state;
+      // Throw alert.
+      alert(
+        "Please submit a bid between the buy-back rate (" +
+        buyBackRate +
+        " ¢/kWh) and the utility rate (" +
+        utilityRate +
+        " ¢/kWh)."
+      );
 
-    // Stores a given value.
-    await contract.methods.set(this.state.value).send({
-      from: this.state.accounts[0]
-    });
+      // Set state.
+      this.setState({ value: "" });
+    } else {
+      // Log.
+      console.log("Bid submitted.");
 
-    // Get the value from the contract to prove it worked.
-    const response = await contract.methods.get().call();
+      // Get state.
+      const {
+        contract
+      } = this.state;
 
-    // Set state.
-    this.setState({
-      bid: response
-    });
+      // Stores a given value.
+      await contract.methods.set(this.state.value).send({
+        from: this.state.accounts[0]
+      });
+
+      // Get the value from the contract to prove it worked.
+      const response = await contract.methods.get().call();
+
+      // Set state.
+      this.setState({ bid: response });
+    }
   }
 
   handleChange(event) {
@@ -235,6 +290,9 @@ class AuctionForm extends Component {
     // Handle loading issues.
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
+    }
+    if (!this.state.consumption || !this.state.production) {
+      return <div>Loading data...</div>;
     }
     if (!this.state.time) {
       return <div>Loading current time...</div>;
@@ -290,12 +348,12 @@ class AuctionForm extends Component {
           <p>See data from the last auction period here.</p>
           <p>
             <strong><i>Electricity Consumption</i></strong><br />
-            {this.state.consumption}<br />
+            {this.state.consumption} kWh<br />
           </p>
 
           <p>
             <strong><i>Electricity Production</i></strong><br />
-            {this.state.production}<br />
+            {this.state.production} kWh<br />
           </p>
 
           <p>
@@ -306,15 +364,15 @@ class AuctionForm extends Component {
           <p>See information about the microgrid here.</p>
 
           <p>
-            <strong><i>Number of Members</i></strong><br />
-            {microgrid}<br />
+            <strong><i>Microgrid Membership</i></strong><br />
+            {microgrid} users.<br />
           </p>
 
           <p>See information about the utility provider here.</p>
 
           <p>
             <strong><i>Utility Rate</i></strong><br />
-            {utilityPrice} cents per kilowatt-hour.<br />
+            {utilityRate} cents per kilowatt-hour.<br />
           </p>
 
           <p>
