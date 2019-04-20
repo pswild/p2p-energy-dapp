@@ -355,7 +355,7 @@ class AuctionForm extends Component {
 
             <div>
 
-              <p>Purchase electricity to meet consumption or store for later.</p>
+              <p>Purchase electricity to meet consumption or store it for later.</p>
 
               <h3>Make a Bid</h3>
               <p>Input bid (¢/kWh) here.</p>
@@ -444,14 +444,14 @@ class AuctionForm extends Component {
             {this.state.production} kilowatt-hours<br />
           </p>
 
-          <p>See current prosumer status and battery levels here.</p>
+          <p>See current capacity for selling or storing electricity here.</p>
           <p>
             <strong><i>Net Production/Consumption</i></strong><br />
             {this.state.netmeter} kilowatt-hours<br />
           </p>
 
           <p>
-            <strong><i>Storage Capacity</i></strong><br />
+            <strong><i>Battery Level</i></strong><br />
             {this.state.level} of {this.state.capacity} kilowatt-hours.<br />
           </p>
 
