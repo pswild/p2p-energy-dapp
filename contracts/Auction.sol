@@ -12,11 +12,11 @@ contract Auction {
 
   /* Static */
 
-  // Utility buyback rate
-  uint buybackRate = 1;
+  // Utility offering rate.
+  uint utilityRate = 12;
 
-  // Utility offering price
-  uint utilityPrice = 10;
+  // Utility buyback rate.
+  uint buybackRate = 3;
 
   /* State */
 
@@ -27,19 +27,21 @@ contract Auction {
    * Functions *
    *************/
 
-  // Place bid
+  // Place bid.
   function bid(uint value) public returns (uint) {
     // Bid must be between the buyback rate and grid price
-    require(buybackRate < value && value < utilityPrice);
+    require(buybackRate < value && value < utilityRate);
     // Place bid
     bids[msg.sender] = value;
     // Return bid value
     return value;
   }
 
-  // View bid
+  // View bid.
   function get() public view returns (uint) {
     // Return bid for this member
     return bids[msg.sender];
   }
+
+  // Choose winner.
 }

@@ -7,7 +7,7 @@ import * as D3 from "d3"
 import Web3 from 'web3'
 
 // Contracts.
-import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
+import SimpleStorageContract from '../../../build/contracts/Auction.json'
 
 ////////////
 // Setup. //
@@ -15,6 +15,7 @@ import SimpleStorageContract from '../../../build/contracts/SimpleStorage.json'
 
 // Battery storage capacity: kWh.
 // (Tesla Powerwall 2).
+const batteryLevel = 0;
 const storageCapacity = 13.5;
 
 // Utility rates: $/kWh.
@@ -43,7 +44,7 @@ class AuctionForm extends Component {
       consumption: null,
       production: null,
       netmeter: null,
-      batteryLevel: 13.5,
+      batteryLevel: batteryLevel,
       storageCapacity: storageCapacity,
       // Current time and date.
       time: null,
@@ -268,7 +269,7 @@ class AuctionForm extends Component {
       } = this.state;
 
       // Stores a given value.
-      await contract.methods.set(this.state.value).send({
+      await contract.methods.bid(this.state.value).send({
         from: this.state.accounts[0]
       });
 
