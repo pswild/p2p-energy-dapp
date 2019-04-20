@@ -7,11 +7,33 @@ import * as D3 from "d3"
 import Web3 from 'web3'
 
 // Contracts.
-import SimpleStorageContract from '../../../build/contracts/Auction.json'
+import AuctionContract from '../../../build/contracts/Auction.json'
 
 ////////////
 // Setup. //
 ////////////
+
+// Ethereum addresses hosted on Ganache.
+var addresses = [
+  "0x8E2077Ab0E6D14AF306106303d879d8b4F580e3f",
+  "0x301D2749B559BC9933b7bA85E5151f2b075DA5eB",
+  "0x4cE4f8F59B69474860d533191685edA6afA83B89",
+  "0x9956168BfD29AE6cadcDbe0A820b069f06Af5F7f",
+  "0xD73c86f2B6cbb14c01F4C634B461D20aa86BD7e1",
+  "0x3D43D1c22Ddd267AC0cE677AcA7c96f31b547234",
+  "0x42C8E0299Fd33b57Fa10628228bDfE1c6f013868",
+  "0x8328Bff14018a2Bd2498B5A04158ADb726185D60",
+  "0xfD2a5AFEE3A3c8C892Fed5A0CCfE705Fd06c6663",
+  "0x4917B088806dA204F406127520Cf06F8E82e17B9"
+];
+
+// Map Ethereum addresses to SunDance data.
+// [key, value]: [eth_addr, sundance_data]
+var users = new Map();
+for (var i = 0; i < 10; i++) {
+  var sundance = require('../../../data/sundance/SunDance_9' + i + '.csv');
+  users.set(addresses[i], sundance);
+}
 
 // Battery storage capacity: kWh.
 // (Tesla Powerwall 2).
@@ -40,7 +62,8 @@ class AuctionForm extends Component {
       accounts: null,
       contract: null,
       // Users and data.
-      users: null,
+      addresses: addresses,
+      users: users,
       consumption: null,
       production: null,
       netmeter: null,
@@ -98,28 +121,6 @@ class AuctionForm extends Component {
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
 
-      // Ethereum addresses hosted on Ganache.
-      var addresses = [
-        "0x8E2077Ab0E6D14AF306106303d879d8b4F580e3f",
-        "0x301D2749B559BC9933b7bA85E5151f2b075DA5eB",
-        "0x4cE4f8F59B69474860d533191685edA6afA83B89",
-        "0x9956168BfD29AE6cadcDbe0A820b069f06Af5F7f",
-        "0xD73c86f2B6cbb14c01F4C634B461D20aa86BD7e1",
-        "0x3D43D1c22Ddd267AC0cE677AcA7c96f31b547234",
-        "0x42C8E0299Fd33b57Fa10628228bDfE1c6f013868",
-        "0x8328Bff14018a2Bd2498B5A04158ADb726185D60",
-        "0xfD2a5AFEE3A3c8C892Fed5A0CCfE705Fd06c6663",
-        "0x4917B088806dA204F406127520Cf06F8E82e17B9"
-      ];
-
-      // Map Ethereum addresses to SunDance data.
-      // [key, value]: [eth_addr, sundance_data]
-      var users = new Map();
-      for (var i = 0; i < 10; i++) {
-        var sundance = require('../../../data/sundance/SunDance_9' + i + '.csv');
-        users.set(addresses[i], sundance);
-      }
-
       // MetaMask account change.
       var selected = accounts[0];
       var accountInterval = setInterval(async function() {
@@ -148,9 +149,9 @@ class AuctionForm extends Component {
 
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
-      const deployedNetwork = SimpleStorageContract.networks[networkId];
+      const deployedNetwork = AuctionContract.networks[networkId];
       const instance = new web3.eth.Contract(
-        SimpleStorageContract.abi,
+        AuctionContract.abi,
         deployedNetwork && deployedNetwork.address,
       );
 
@@ -263,18 +264,13 @@ class AuctionForm extends Component {
       // Log.
       console.log("Bid submitted.");
 
-      // Get state.
-      const {
-        contract
-      } = this.state;
-
       // Stores a given value.
-      await contract.methods.bid(this.state.value).send({
+      await this.state.contract.methods.bid(this.state.value).send({
         from: this.state.accounts[0]
       });
 
       // Get the value from the contract to prove it worked.
-      const response = await contract.methods.get().call();
+      const response = await this.state.contract.methods.get().call();
 
       // Set state.
       this.setState({ bid: response });
@@ -296,6 +292,9 @@ class AuctionForm extends Component {
       // Log.
       console.log("Auction initialized.")
 
+      // NOTE: Initialize contract instance. Start auction by calculating full
+      // production capacity of current microgrid.
+
       // Set state.
       this.setState({ isAuction: true });
     } catch (error) {
@@ -310,6 +309,8 @@ class AuctionForm extends Component {
     try  {
       // Log.
       console.log("Auction finalized.");
+
+      // NOTE: End auction and display results. Pay users if necessary.
 
       // Set state.
       this.setState({ isAuction: false });
