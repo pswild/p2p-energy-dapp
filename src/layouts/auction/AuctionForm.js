@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 
 // D3.
 import * as D3 from "d3"
-
 // Web3.
 import Web3 from 'web3'
 
@@ -27,21 +26,18 @@ var addresses = [
   "0x4917B088806dA204F406127520Cf06F8E82e17B9"
 ];
 
-// Map Ethereum addresses to SunDance data.
-// [key, value]: [eth_addr, sundance_data]
-var users = new Map();
+// Map Ethereum addresses to data, bids, quantities.
+var data = new Map();
 for (var i = 0; i < 10; i++) {
   var sundance = require('../../../data/sundance/SunDance_9' + i + '.csv');
-  users.set(addresses[i], sundance);
+  data.set(addresses[i], sundance);
 }
 
 // Battery storage capacity: kWh.
-// (Tesla Powerwall 2).
-const batteryLevel = 0;
+const batteryLevel = 5;
 const storageCapacity = 13.5;
 
 // Utility rates: $/kWh.
-// (Average U.S. statistics).
 var utilityRate = 12;
 var buyBackRate = 3;
 
@@ -61,12 +57,15 @@ class AuctionForm extends Component {
       web3: null,
       accounts: null,
       contract: null,
-      // Users and data.
+      // Addresses.
       addresses: addresses,
-      users: users,
+      // Data.
+      data: data,
+      // Production and consumption.
       consumption: null,
       production: null,
       netmeter: null,
+      // Battery storage.
       batteryLevel: batteryLevel,
       storageCapacity: storageCapacity,
       // Current time and date.
@@ -76,14 +75,21 @@ class AuctionForm extends Component {
       isConsumer: false,
       isProducer: false,
       isAuction: false,
+      // Bids and quantities.
+      bids: new Map(),
+      quantities: new Map(),
       // Event handling.
-      value: "",
-      bid: "[No bids have been submitted.]"
+      bidValue: "",
+      quantityValue: "",
+      bid: "[No bid has been submitted.]",
+      quantity: "[No quantity has been submitted.]"
     };
 
     // Handle changes.
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleBidChange = this.handleBidChange.bind(this);
+    this.handleBidSubmit = this.handleBidSubmit.bind(this);
+    this.handleQuantityChange = this.handleQuantityChange.bind(this);
+    this.handleQuantitySubmit = this.handleQuantitySubmit.bind(this);
   }
 
   // Load Web3.
@@ -102,8 +108,7 @@ class AuctionForm extends Component {
           {
             time: new Date().toLocaleString(),
             next: 60 - new Date().getMinutes()
-          },
-          this.process
+          }
         );
       }
     }.bind(this), 100);
@@ -139,7 +144,8 @@ class AuctionForm extends Component {
             this.setState(
               {
                 accounts, consumption: "", production: "", netmeter: "",
-                value: "", bid: "[No bids have been submitted.]"
+                bidValue: "", bid: "[No bid has been submitted.]",
+                quantityValue: "", quantity: "[No quantity has been submitted.]"
               },
               this.process
             );
@@ -150,15 +156,19 @@ class AuctionForm extends Component {
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = AuctionContract.networks[networkId];
-      const instance = new web3.eth.Contract(
+      const contract = new web3.eth.Contract(
         AuctionContract.abi,
         deployedNetwork && deployedNetwork.address,
       );
 
       // Set web3, accounts, and contract to the state.
       this.setState(
-        { web3, accounts, contract: instance, users },
+        { web3, accounts, contract },
         this.process
+      );
+      // Initalize auction.
+      this.setState(
+        this.initialize
       );
     } catch (error) {
       // Throw error.
@@ -190,7 +200,7 @@ class AuctionForm extends Component {
       var current = m + "/" + d + "/15 " + h + ":00";
 
       // Parse CSV file.
-      D3.csv(this.state.users.get(this.state.accounts[0])).then(function(data) {
+      D3.csv(this.state.data.get(this.state.accounts[0])).then(function(data) {
         // Consumption.
         var consumption;
         // Production.
@@ -240,12 +250,12 @@ class AuctionForm extends Component {
   /////////////////////
 
   // Submit bid.
-  async handleSubmit(event) {
+  async handleBidSubmit(event) {
     // Prevent page reload.
     event.preventDefault();
 
     // Only accept valid bids.
-    if (this.state.value < buyBackRate || this.state.value > utilityRate) {
+    if (this.state.bidValue < buyBackRate || this.state.bidValue > utilityRate) {
       // Log.
       console.log("Invalid bid.");
 
@@ -259,27 +269,64 @@ class AuctionForm extends Component {
       );
 
       // Set state.
-      this.setState({ value: "" });
+      this.setState({ bidValue: "" });
     } else {
       // Log.
       console.log("Bid submitted.");
 
-      // Stores a given value.
-      await this.state.contract.methods.bid(this.state.value).send({
+      // Submit bid.
+      await this.state.contract.methods.bid(this.state.bidValue).send({
         from: this.state.accounts[0]
       });
 
-      // Get the value from the contract to prove it worked.
+      // Get bid.
       const response = await this.state.contract.methods.get().call();
 
       // Set state.
       this.setState({ bid: response });
     }
   }
+  // Submit quantity.
+  async handleQuantitySubmit(event) {
+    // Prevent page reload.
+    event.preventDefault();
 
-  handleChange(event) {
+    // TODO: Only accept valid quantity.
+    if (this.state.quantityValue < 0) {
+      // Log.
+      console.log("Invalid quantity.");
+
+      // Throw alert.
+      alert(
+        "Please submit a quantity between ..."
+      );
+
+      // Set state.
+      this.setState({ quantityValue: "" });
+    } else {
+      // Log.
+      console.log("Quantity submitted.");
+
+      // Submit quantity.
+      // ...
+
+      // Get quantity.
+      // ...
+
+      // Set state.
+      this.setState({ quantity: this.state.quantityValue });
+    }
+  }
+
+  // Handle bid.
+  handleBidChange(event) {
     // Set state.
-    this.setState({ value: event.target.value });
+    this.setState({ bidValue: event.target.value });
+  }
+  // Handle quantity.
+  handleQuantityChange(event) {
+    // Set state.
+    this.setState({ quantityValue: event.target.value });
   }
 
   //////////////
@@ -292,8 +339,30 @@ class AuctionForm extends Component {
       // Log.
       console.log("Auction initialized.")
 
-      // NOTE: Initialize contract instance. Start auction by calculating full
-      // production capacity of current microgrid.
+      // TODO: Start auction on the hour.
+      // Recalculate production, consumption, and storage capacity.
+
+      // Timeout length.
+      var t0 = new Date();
+      var t1 = new Date(
+        t0.getFullYear(), t0.getMonth(), t0.getDate(), t0.getHours() + 1,
+        0, 0, 0
+      );
+      var d = t1 - t0;
+
+      // Reset auction on timeout.
+      var auctionTimeout = setTimeout(async function() {
+        // Stop if unmounted.
+        if (!this.mounted) {
+          clearTimeout(auctionTimeout);
+        } else {
+          // Update state.
+          this.setState(
+            { isAuction: true },
+            this.process
+          );
+        }
+      }.bind(this), d);
 
       // Set state.
       this.setState({ isAuction: true });
@@ -310,7 +379,7 @@ class AuctionForm extends Component {
       // Log.
       console.log("Auction finalized.");
 
-      // NOTE: End auction and display results. Pay users if necessary.
+      // TODO: End auction and display results. Pay if necessary.
 
       // Set state.
       this.setState({ isAuction: false });
@@ -329,7 +398,7 @@ class AuctionForm extends Component {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
     if (!this.state.consumption || !this.state.production || !this.state.netmeter) {
-      return <div>Loading data...</div>;
+      return <div>Loading user data...</div>;
     }
     if (!this.state.time) {
       return <div>Loading current time...</div>;
@@ -341,30 +410,23 @@ class AuctionForm extends Component {
 
         <div id="left">
 
-          <p>
-            <strong><i>Current Time</i></strong><br />
-            {this.state.time}<br />
-          </p>
+          <h2>Auction Details</h2>
 
-          <p>
-            <strong><i>Current Auction</i></strong><br />
-            The auction period ends in {this.state.next} minute(s).<br />
-          </p>
+          <p>The auction period ends in {this.state.next} minute(s).</p>
 
-          <h2>Consumer Corner</h2>
+          <h3>Buy Electricity</h3>
 
           {this.state.isConsumer ? (
 
             <div>
 
-              <p>Purchase electricity to meet consumption or store it for later.</p>
+              <p><strong>Buy electricity to meet consumption or store for later.</strong></p>
 
-              <h3>Make a Bid</h3>
-              <p>Input bid (¢/kWh) here.</p>
+              <p>Input bid (¢/kWh).</p>
 
-                <form onSubmit={this.handleSubmit}>
+                <form onSubmit={this.handleBidSubmit}>
                   <label>
-                    <input type="text" value={this.state.value} onChange={this.handleChange} />
+                    <input type="text" value={this.state.bidValue} onChange={this.handleBidChange} />
                   </label>
                   <input type="submit" value="Submit" />
                   <div>
@@ -372,44 +434,58 @@ class AuctionForm extends Component {
                   </div>
                 </form>
 
+              <p>Input quantity (kWh).</p>
+
+              <form onSubmit={this.handleQuantitySubmit}>
+                <label>
+                  <input type="text" value={this.state.quantityValue} onChange={this.handleQuantityChange} />
+                </label>
+                <input type="submit" value="Submit" />
+                <div>
+                  <p>Quantity: {this.state.quantity}</p>
+                </div>
+              </form>
+
             </div>
 
           ) : (
 
             <div>
 
-              <p>You have no leftover capacity to store electricity.</p>
+              <p><strong>You have no capacity to store electricity.</strong></p>
 
             </div>
 
           )}
 
-          <h2>Producer Corner</h2>
+          <h3>Sell Electricity</h3>
 
           {this.state.isProducer ? (
 
             <div>
 
-              <p>Sell excess electricity on the market.</p>
+              <p><strong>Sell excess electricity on the market.</strong></p>
 
               {!this.state.isAuction ? (
+
                 <div>
 
-                  <h3>Start an Auction</h3>
-                  <p>Set up an auction here.</p>
+                  <p># Explain auction requirements here. #</p>
 
-                  <button onClick={() => {this.initialize()}}>Start Auction</button>
+                  <button onClick={() => {this.initialize()}}>Enter Auction</button>
 
                 </div>
+
               ) : (
+
                 <div>
 
-                  <h3>End an Auction</h3>
-                  <p>See the auction results here.</p>
+                  <p># Explain compensation here. #</p>
 
                   <button onClick={() => {this.finalize()}}>End Auction</button>
 
                 </div>
+
               )}
 
             </div>
@@ -418,7 +494,7 @@ class AuctionForm extends Component {
 
             <div>
 
-              <p>You have no excess electricity to sell.</p>
+              <p><strong>You have no excess electricity to sell.</strong></p>
 
             </div>
 

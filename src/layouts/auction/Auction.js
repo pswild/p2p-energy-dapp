@@ -22,7 +22,14 @@ class Auction extends Component {
           <div className="pure-u-1-1">
 
           <h1>Auction</h1>
-          <p><i>Specify your auction preferences here.</i></p>
+
+          <p>
+            <strong>Welcome to the Auction</strong>
+          </p>
+
+          <p>
+            A new auction starts on every hour. You may buy or sell electricity at any point. When the auction ends, you will be compensated or charged accordingly.
+          </p>
 
           <AuctionForm />
 
