@@ -1,5 +1,9 @@
 import React, { Component } from 'react'
 
+//////////////
+// Imports. //
+//////////////
+
 // D3.
 import * as D3 from "d3"
 // Web3.
@@ -13,7 +17,7 @@ import AuctionContract from '../../../build/contracts/Auction.json'
 ////////////
 
 // Ethereum addresses hosted on Ganache.
-var addresses = [
+const addresses = [
   "0x8E2077Ab0E6D14AF306106303d879d8b4F580e3f",
   "0x301D2749B559BC9933b7bA85E5151f2b075DA5eB",
   "0x4cE4f8F59B69474860d533191685edA6afA83B89",
@@ -26,20 +30,35 @@ var addresses = [
   "0x4917B088806dA204F406127520Cf06F8E82e17B9"
 ];
 
-// Map Ethereum addresses to data, bids, quantities.
-var data = new Map();
+// Map Ethereum addresses to account information.
+var users = new Map();
 for (var i = 0; i < 10; i++) {
+  // SunDance data.
   var sundance = require('../../../data/sundance/SunDance_9' + i + '.csv');
-  data.set(addresses[i], sundance);
+
+  // User object.
+  var user = {
+    data: sundance,     // Production and consumption data file.
+    consumption: null,  // Current consumption.
+    production: null,   // Current production.
+    netmeter: null,     // Current net meter calculation.
+    batt: 0             // Current battery level.
+  }
+
+  // Add to users.
+  users.set(addresses[i], user);
 }
 
+///////////////////////
+// Grid Information. //
+///////////////////////
+
 // Battery storage capacity: kWh.
-const batteryLevel = 5;
 const storageCapacity = 13.5;
 
 // Utility rates: $/kWh.
-var utilityRate = 12;
-var buyBackRate = 3;
+const buyBackRate = 3;
+const utilityRate = 12;
 
 ///////////////////
 // Auction form. //
@@ -49,25 +68,51 @@ class AuctionForm extends Component {
   constructor(props) {
     super(props);
 
+    ////////////
+    // State. //
+    ////////////
+
     // Set state.
     this.state = {
-      // Prevents unmounted state changes.
-      mounted: null,
+
+      ///////////
+      // Web3. //
+      ///////////
+
       // Load Web3, accounts, and contract.
       web3: null,
       accounts: null,
       contract: null,
-      // Addresses.
-      addresses: addresses,
-      // Data.
-      data: data,
-      // Production and consumption.
+
+      ////////////////
+      // All Users. //
+      ////////////////
+
+      // User information.
+      // users: users,
+      // Bids, prices, buyer and seller quantities.
+      bids: new Map(),
+      prices: new Map(),
+      buyerQuants: new Map(),
+      sellerQuants: new Map(),
+
+      ///////////////////
+      // Current User. //
+      ///////////////////
+
+      // Production, consumption, net meter.
       consumption: null,
       production: null,
       netmeter: null,
-      // Battery storage.
-      batteryLevel: batteryLevel,
-      storageCapacity: storageCapacity,
+      // Battery level.
+      batt: null,
+
+      ////////////////////
+      // UI Components. //
+      ////////////////////
+
+      // Prevents unmounted state changes.
+      mounted: null,
       // Current time and date.
       time: null,
       next: null,
@@ -75,15 +120,16 @@ class AuctionForm extends Component {
       isConsumer: false,
       isProducer: false,
       isAuction: false,
-      // Bids and quantities.
-      bids: new Map(),
-      quantities: new Map(),
       // Event handling.
       bidValue: "",
       quantityValue: "",
       bid: "[No bid has been submitted.]",
       quantity: "[No quantity has been submitted.]"
     };
+
+    /////////////////////
+    // Event handlers. //
+    /////////////////////
 
     // Handle changes.
     this.handleBidChange = this.handleBidChange.bind(this);
@@ -97,7 +143,11 @@ class AuctionForm extends Component {
     // Register mounted.
     this.mounted = true;
 
-    // Current time.
+    ////////////////////
+    // Auction Timer. //
+    ////////////////////
+
+    // Auction period.
     var timeInterval = setInterval(async function() {
       // Stop if unmounted.
       if (!this.mounted) {
@@ -114,6 +164,11 @@ class AuctionForm extends Component {
     }.bind(this), 100);
 
     try {
+
+      //////////////////////////
+      // Web3 Initialization. //
+      //////////////////////////
+
       // Web3.
       var web3 = window.web3;
 
@@ -123,8 +178,20 @@ class AuctionForm extends Component {
       // Enable MetaMask.
       await web3.currentProvider.enable();
 
-      // Use web3 to get the user's accounts.
+      // Use web3 to get the current account.
       const accounts = await web3.eth.getAccounts();
+
+      // Get the contract instance.
+      const networkId = await web3.eth.net.getId();
+      const deployedNetwork = AuctionContract.networks[networkId];
+      const contract = new web3.eth.Contract(
+        AuctionContract.abi,
+        deployedNetwork && deployedNetwork.address,
+      );
+
+      ///////////////
+      // MetaMask. //
+      ///////////////
 
       // MetaMask account change.
       var selected = accounts[0];
@@ -143,32 +210,23 @@ class AuctionForm extends Component {
             selected = accounts[0];
             this.setState(
               {
-                accounts, consumption: "", production: "", netmeter: "",
+                accounts,
+                consumption: users.get(selected).consumption,
+                production: users.get(selected).production,
+                netmeter: users.get(selected).netmeter,
+                batt: users.get(selected).batt,
                 bidValue: "", bid: "[No bid has been submitted.]",
                 quantityValue: "", quantity: "[No quantity has been submitted.]"
-              },
-              this.process
+              }
             );
           }
         }
       }.bind(this), 100);
 
-      // Get the contract instance.
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = AuctionContract.networks[networkId];
-      const contract = new web3.eth.Contract(
-        AuctionContract.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
-
       // Set web3, accounts, and contract to the state.
       this.setState(
         { web3, accounts, contract },
         this.process
-      );
-      // Initalize auction.
-      this.setState(
-        this.initialize
       );
     } catch (error) {
       // Throw error.
@@ -190,6 +248,11 @@ class AuctionForm extends Component {
   // Process data.
   async process() {
     try {
+
+      /////////////////////////////////////////
+      // Consumption, Production, Net Meter. //
+      /////////////////////////////////////////
+
       // Current time and date.
       var now = new Date();
       var m = now.getMonth() + 1;
@@ -199,8 +262,11 @@ class AuctionForm extends Component {
       // Date string.
       var current = m + "/" + d + "/15 " + h + ":00";
 
-      // Parse CSV file.
-      D3.csv(this.state.data.get(this.state.accounts[0])).then(function(data) {
+      // Iterate through all addresses.
+      for (const address of addresses) {
+        // Parse CSV file.
+        const data = await D3.csv(users.get(address).data);
+
         // Consumption.
         var consumption;
         // Production.
@@ -218,10 +284,10 @@ class AuctionForm extends Component {
             netmeter = production - consumption;
 
             // Identify if consumer, producer, or both.
-            if (netmeter < 0 || this.state.batteryLevel < this.state.storageCapacity) {
+            if (netmeter < 0 || this.state.batt < storageCapacity) {
               this.setState({ isConsumer: true });
             }
-            if (netmeter > 0 || this.state.batteryLevel > 0) {
+            if (netmeter > 0 || this.state.batt > 0) {
               this.setState({ isProducer: true });
             }
 
@@ -235,9 +301,23 @@ class AuctionForm extends Component {
           }
         }
 
-        // Set consumption and production to state.
-        this.setState({ consumption, production, netmeter} );
-      }.bind(this));
+        // Update users.
+        var user = users.get(address);
+        user.consumption = consumption;
+        user.production = production;
+        user.netmeter = netmeter;
+        users.set(address, user);
+      }
+
+      // Set state.
+      this.setState(
+        {
+          consumption: users.get(this.state.accounts[0]).consumption,
+          production: users.get(this.state.accounts[0]).production,
+          netmeter: users.get(this.state.accounts[0]).netmeter,
+          batt: users.get(this.state.accounts[0]).batt
+        }
+      );
     } catch (error) {
       // Throw error.
       alert(`Failed to load data.`);
@@ -283,7 +363,7 @@ class AuctionForm extends Component {
       const response = await this.state.contract.methods.get().call();
 
       // Set state.
-      this.setState({ bid: response });
+      this.setState({ bidValue: "", bid: response,  });
     }
   }
   // Submit quantity.
@@ -308,13 +388,10 @@ class AuctionForm extends Component {
       console.log("Quantity submitted.");
 
       // Submit quantity.
-      // ...
-
-      // Get quantity.
-      // ...
+      var quantity = this.state.quantityValue;
 
       // Set state.
-      this.setState({ quantity: this.state.quantityValue });
+      this.setState({ quantityValue: "", quantity });
     }
   }
 
@@ -356,11 +433,11 @@ class AuctionForm extends Component {
         if (!this.mounted) {
           clearTimeout(auctionTimeout);
         } else {
+          // Log.
+          console.log("A new auction period has begun.")
+
           // Update state.
-          this.setState(
-            { isAuction: true },
-            this.process
-          );
+          this.setState( this.process );
         }
       }.bind(this), d);
 
@@ -422,6 +499,11 @@ class AuctionForm extends Component {
 
               <p><strong>Buy electricity to meet consumption or store for later.</strong></p>
 
+              <p># Explain buyer requirements here. #</p>
+              <p>You currently have X net production/consumption and Y additional storage capacity.</p>
+              <p>You must buy at least Z during this auction. You may buy up to T during this auction.</p>
+              <p>New bids and quantities overwrite previous submissions.</p>
+
               <p>Input bid (¢/kWh).</p>
 
                 <form onSubmit={this.handleBidSubmit}>
@@ -470,7 +552,9 @@ class AuctionForm extends Component {
 
                 <div>
 
-                  <p># Explain auction requirements here. #</p>
+                  <p># Explain seller requirements here. #</p>
+                  <p>You currently have X net production/consumption and X stored energy.</p>
+                  <p>You must set at least Y during this auction. You may sell up to Z during this auction.</p>
 
                   <button onClick={() => {this.initialize()}}>Enter Auction</button>
 
@@ -481,6 +565,8 @@ class AuctionForm extends Component {
                 <div>
 
                   <p># Explain compensation here. #</p>
+                  <p>You have already entered a quantity to sell in this auction.</p>
+                  <p>To end the auction early and view results, click below.</p>
 
                   <button onClick={() => {this.finalize()}}>End Auction</button>
 
@@ -530,7 +616,7 @@ class AuctionForm extends Component {
 
           <p>
             <strong><i>Battery Storage Level</i></strong><br />
-            {this.state.batteryLevel} of {this.state.storageCapacity} kilowatt-hours.<br />
+            {this.state.batt} of {storageCapacity} kilowatt-hours.<br />
           </p>
 
           <p>See information about the utility provider here.</p>

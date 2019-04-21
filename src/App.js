@@ -20,6 +20,14 @@ class App extends Component {
 
   constructor(props){
     super(props)
+
+    // Set state.
+    this.state = {};
+  }
+
+  async componentDidMount() {
+    // Log.
+    // console.log("App component mounted.");
   }
 
   // Render.

@@ -15,6 +15,11 @@ class Auction extends Component {
     this.state = {};
   }
 
+  async componentDidMount() {
+    // Log.
+    // console.log("Auction component mounted.");
+  }
+
   render() {
     return (
       <main className="container">
@@ -24,7 +29,7 @@ class Auction extends Component {
           <h1>Auction</h1>
 
           <p>
-            <strong>Welcome to the Auction</strong>
+            <i>Specify your auction preferences here.</i>
           </p>
 
           <p>

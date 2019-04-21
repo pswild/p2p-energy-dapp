@@ -1,6 +1,18 @@
 import React, { Component } from 'react'
 
 class Home extends Component {
+  constructor(props) {
+    super(props);
+
+    // Set state.
+    this.state = {};
+  }
+
+  async componentDidMount() {
+    // Log.
+    // console.log("Home component mounted.");
+  }
+
   render() {
     return(
       <main className="container">
