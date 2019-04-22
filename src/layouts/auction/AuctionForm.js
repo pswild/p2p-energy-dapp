@@ -500,10 +500,19 @@ class AuctionForm extends Component {
           // Log.
           console.log("A new auction period has begun.")
 
-          // Set state.
+          // Set consumption, production, net meter, and storage state.
           this.setState( this.process );
         }
       }.bind(this), d);
+
+      // Reinitalize auction data.
+      for (const address of addresses) {
+        bids.set(address, "[No bid has been submitted.]");
+        buyerQuants.set(address, "[No bid quantity has been submitted.]");
+        sellerQuants.set(address, "[No sell quantity has been submitted.]");
+        prices.set(address, 0);
+        payments.set(address, 0);
+      }
 
       // Set state.
       this.setState({ isAuction: true });
@@ -521,10 +530,6 @@ class AuctionForm extends Component {
       console.log("Auction finalized.");
 
       // Log.
-      // console.log("Users: ");
-      // console.log(users);
-      // console.log("Battery storage levels: ");
-      // console.log(storage);
       console.log("Buyer bid values: ");
       console.log(bids);
       console.log("Buyer bid quantities: ");
