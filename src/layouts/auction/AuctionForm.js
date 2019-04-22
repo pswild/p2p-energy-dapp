@@ -288,7 +288,7 @@ class AuctionForm extends Component {
       var now = new Date();
       var m = now.getMonth() + 1;
       var d = now.getDate();
-      var h = now.getHours() - 4;
+      var h = now.getHours();
 
       // Date string.
       var current = m + "/" + d + "/15 " + h + ":00";
