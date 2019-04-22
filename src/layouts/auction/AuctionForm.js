@@ -288,7 +288,7 @@ class AuctionForm extends Component {
       var now = new Date();
       var m = now.getMonth() + 1;
       var d = now.getDate();
-      var h = now.getHours();
+      var h = now.getHours() - 4;
 
       // Date string.
       var current = m + "/" + d + "/15 " + h + ":00";
@@ -849,7 +849,7 @@ class AuctionForm extends Component {
 
                 <div>
 
-                  <p>You earned {payments.get(this.state.accounts[0])} cents for {sellerQuants.get(this.state.accounts[0])} of electricity.</p>
+                  <p>You earned {payments.get(this.state.accounts[0])} cents for {sellerQuants.get(this.state.accounts[0])} kWh of electricity.</p>
 
                 </div>
 
