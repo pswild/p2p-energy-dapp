@@ -237,7 +237,9 @@ class AuctionForm extends Component {
                 bidQuantityValue: "",
                 bidQuantity: buyerQuants.get(selected),
                 sellQuantityValue: "",
-                sellQuantity: sellerQuants.get(selected)
+                sellQuantity: sellerQuants.get(selected),
+                isBuyer: true,
+                isSeller: true
               }
             );
 
@@ -376,7 +378,7 @@ class AuctionForm extends Component {
     event.preventDefault();
 
     // Only accept valid bids.
-    if (this.state.bidValue <= buyBackRate || this.state.bidValue >= utilityRate) {
+    if ((parseFloat(this.state.bidValue) <= parseFloat(buyBackRate)) || (parseFloat(this.state.bidValue) >= parseFloat(utilityRate))) {
       // Log.
       console.log("Invalid bid.");
 
@@ -420,14 +422,18 @@ class AuctionForm extends Component {
     // Prevent page reload.
     event.preventDefault();
 
-    // TODO: Only accept valid bid quantity.
-    if (this.state.bidQuantityValue < 0) {
+    // Available capacity.
+    var available = parseFloat(storageCapacity) - parseFloat(this.state.batt) - parseFloat(this.state.netmeter);
+    // Only accept valid bid quantity.
+    if ((parseFloat(this.state.bidQuantityValue) <= 0) || (parseFloat(this.state.bidQuantityValue) > available)) {
       // Log.
       console.log("Invalid bid quantity.");
 
       // Throw alert.
       alert(
-        "Please submit a bid quantity between ..."
+        "Please submit a bid quantity between 0 kWh and " +
+        available +
+        " kWh."
       );
 
       // Set state.
@@ -457,14 +463,18 @@ class AuctionForm extends Component {
     // Prevent page reload.
     event.preventDefault();
 
-    // TODO: Only accept valid sell quantity.
-    if (this.state.sellQuantityValue < 0) {
+    // Available supply.
+    var available = parseFloat(this.state.netmeter) + parseFloat(this.state.batt);
+    // Only accept valid sell quantity.
+    if ((parseFloat(this.state.sellQuantityValue) <= 0) || (parseFloat(this.state.sellQuantityValue) > available)) {
       // Log.
       console.log("Invalid sell quantity.");
 
       // Throw alert.
       alert(
-        "Please submit a sell quantity between ..."
+        "Please submit a sell quantity between 0 kWh and " +
+        available +
+        " kWh."
       );
 
       // Set state.
@@ -733,6 +743,31 @@ class AuctionForm extends Component {
       console.log("Seller payments: ");
       console.log(payments);
 
+      // Set state.
+      await this.setState({ isAuction: false });
+
+      // Identify if buyer or seller.
+      this.identify();
+    } catch (error) {
+      // Throw error.
+      alert(`Failed to finalize auction.`);
+      console.error(error);
+    }
+  }
+
+  // Determine buyer or seller identity.
+  identify() {
+    // Check auction state.
+    if (this.state.isAuction) {
+      // Check buyer state.
+      if ((this.state.bid != "[No bid has been submitted.]") && (this.state.bidQuantity != "[No bid quantity has been submitted.]")) {
+        this.setState({ isSeller: false });
+      }
+      // Check seller state.
+      if (this.state.sellQuantity != "[No sell quantity has been submitted.]") {
+        this.setState({ isBuyer: false });
+      }
+    } else {
       // Check buyer state.
       if ((this.state.bid != "[No bid has been submitted.]") && (this.state.bidQuantity != "[No bid quantity has been submitted.]")) {
         this.setState({ isBuyer: true });
@@ -745,26 +780,6 @@ class AuctionForm extends Component {
       } else {
         this.setState({ isSeller: false });
       }
-
-
-      // Set state.
-      this.setState({ isAuction: false });
-    } catch (error) {
-      // Throw error.
-      alert(`Failed to finalize auction.`);
-      console.error(error);
-    }
-  }
-
-  // Determine buyer or seller identity.
-  identify() {
-    // Check buyer state.
-    if ((this.state.bid != "[No bid has been submitted.]") && (this.state.bidQuantity != "[No bid quantity has been submitted.]")) {
-      this.setState({ isSeller: false });
-    }
-    // Check seller state.
-    if (this.state.sellQuantity != "[No sell quantity has been submitted.]") {
-      this.setState({ isBuyer: false });
     }
   }
 
@@ -874,7 +889,7 @@ class AuctionForm extends Component {
 
                 <div>
 
-                  <p>You paid {parseFloat(prices.get(this.state.accounts[0])).toFixed(2)} cents for {parseFloat(buyerQuants.get(this.state.accounts[0])).toFixed(2)} kWh of electricity.</p>
+                  <p>You paid {parseFloat(prices.get(this.state.accounts[0])).toFixed(2)} ¢ for {parseFloat(buyerQuants.get(this.state.accounts[0])).toFixed(2)} kWh of electricity (a savings of {parseFloat((parseFloat(buyerQuants.get(this.state.accounts[0])) * parseFloat(utilityRate)) - parseFloat(prices.get(this.state.accounts[0]))).toFixed(2)} ¢).</p>
 
                 </div>
 
@@ -957,7 +972,7 @@ class AuctionForm extends Component {
 
                   <div>
 
-                    <p>You earned {parseFloat(payments.get(this.state.accounts[0])).toFixed(2)} cents for {parseFloat(sellerQuants.get(this.state.accounts[0])).toFixed(2)} kWh of electricity.</p>
+                    <p>You earned {parseFloat(payments.get(this.state.accounts[0])).toFixed(2)} ¢ for {parseFloat(sellerQuants.get(this.state.accounts[0])).toFixed(2)} kWh of electricity (an extra {parseFloat(parseFloat(payments.get(this.state.accounts[0])) - (parseFloat(sellerQuants.get(this.state.accounts[0])) * parseFloat(buyBackRate))).toFixed(2)} ¢).</p>
 
                   </div>
 
