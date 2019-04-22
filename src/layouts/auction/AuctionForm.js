@@ -113,6 +113,10 @@ class AuctionForm extends Component {
       netmeter: null,
       // Battery level.
       batt: null,
+      // Demand, supply, and capacity (current auction period).
+      // demand: null,
+      // supply: null,
+      // capacity: null,
 
       ////////////////////
       // UI Components. //
@@ -234,6 +238,18 @@ class AuctionForm extends Component {
                 sellQuantity: sellerQuants.get(selected)
               }
             );
+
+            // Identify if consumer, producer, or both.
+            if ((parseFloat(storageCapacity) - parseFloat(this.state.batt) - parseFloat(this.state.netmeter)) > 0) {
+              this.setState({ isConsumer: true });
+            } else {
+              this.setState({ isConsumer: false });
+            }
+            if ((parseFloat(this.state.netmeter) + parseFloat(this.state.batt)) > 0) {
+              this.setState({ isProducer: true });
+            } else  {
+              this.setState({ isProducer: false });
+            }
           }
         }
       }.bind(this), 100);
@@ -298,14 +314,6 @@ class AuctionForm extends Component {
             production = parseFloat(data[i].gen.replace(/-|\s/g,""));
             netmeter = production - consumption;
 
-            // Identify if consumer, producer, or both.
-            if (netmeter < 0 || this.state.batt < storageCapacity) {
-              this.setState({ isConsumer: true });
-            }
-            if (netmeter > 0 || this.state.batt > 0) {
-              this.setState({ isProducer: true });
-            }
-
             // Round to two decimal places.
             consumption = consumption.toFixed(2);
             production = production.toFixed(2);
@@ -334,6 +342,18 @@ class AuctionForm extends Component {
         },
         this.initialize
       );
+
+      // Identify if consumer, producer, or both.
+      if ((parseFloat(storageCapacity) - parseFloat(this.state.batt) - parseFloat(this.state.netmeter)) > 0) {
+        this.setState({ isConsumer: true });
+      } else {
+        this.setState({ isConsumer: false });
+      }
+      if ((parseFloat(this.state.netmeter) + parseFloat(this.state.batt)) > 0) {
+        this.setState({ isProducer: true });
+      } else  {
+        this.setState({ isProducer: false });
+      }
     } catch (error) {
       // Throw error.
       alert(`Failed to load data.`);
@@ -743,7 +763,7 @@ class AuctionForm extends Component {
 
                 <div>
 
-                  <p># Explain buyer requirements here. #</p>
+                  <p>You have {parseFloat(storageCapacity) - parseFloat(this.state.batt) - parseFloat(this.state.netmeter)} kWh of available capacity.</p>
 
                   <p>Input bid value (¢/kWh).</p>
 
@@ -775,7 +795,7 @@ class AuctionForm extends Component {
 
               <div>
 
-                <p># Explain compensation for buyers here. #</p>
+                <p>You paid {prices.get(this.state.accounts[0])} cents for {buyerQuants.get(this.state.accounts[0])} kWh of electricity.</p>
 
               </div>
 
@@ -805,7 +825,7 @@ class AuctionForm extends Component {
 
                 <div>
 
-                  <p># Explain seller requirements here. #</p>
+                  <p>You have {parseFloat(this.state.netmeter) + parseFloat(this.state.batt)} kWh of available electricity.</p>
 
                   <p>Input sell quantity (kWh).</p>
 
@@ -829,7 +849,7 @@ class AuctionForm extends Component {
 
                 <div>
 
-                  <p># Explain compensation for sellers here. #</p>
+                  <p>You earned {payments.get(this.state.accounts[0])} cents for {sellerQuants.get(this.state.accounts[0])} of electricity.</p>
 
                 </div>
 
