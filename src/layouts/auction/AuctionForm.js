@@ -689,7 +689,7 @@ class AuctionForm extends Component {
             // Previous seller payment.
             var p = parseFloat(payments.get(s));
             // Issue payment proportional to percentage of supply.
-            payments.set(s, p + (v * (sq / supply)));
+            payments.set(s, p + (v * (sq * (sq / supply))));
           }
 
           // Utility grid. //
