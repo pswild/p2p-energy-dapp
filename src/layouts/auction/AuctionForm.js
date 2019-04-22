@@ -65,7 +65,7 @@ for (const address of addresses) {
   sellerQuants.set(address, "[No sell quantity has been submitted.]");
   prices.set(address, 0);
   payments.set(address, 0);
-  storage.set(address, 0);
+  storage.set(address, 0.0);
 }
 
 ///////////////////////
@@ -73,7 +73,7 @@ for (const address of addresses) {
 ///////////////////////
 
 // Battery storage capacity: kWh.
-const storageCapacity = 13.5;
+const storageCapacity = 13.50;
 
 // Utility rates: $/kWh.
 const buyBackRate = 3.0;
@@ -128,6 +128,8 @@ class AuctionForm extends Component {
       time: null,
       next: null,
       // Conditional rendering.
+      isBuyer: false,
+      isSeller: false,
       isConsumer: false,
       isProducer: false,
       isAuction: false,
@@ -223,7 +225,7 @@ class AuctionForm extends Component {
 
             // Update state.
             selected = accounts[0];
-            this.setState(
+            await this.setState(
               {
                 accounts,
                 consumption: users.get(selected).consumption,
@@ -250,6 +252,9 @@ class AuctionForm extends Component {
             } else  {
               this.setState({ isProducer: false });
             }
+
+            // Identify if buyer or seller.
+            this.identify();
           }
         }
       }.bind(this), 100);
@@ -371,7 +376,7 @@ class AuctionForm extends Component {
     event.preventDefault();
 
     // Only accept valid bids.
-    if (this.state.bidValue < buyBackRate || this.state.bidValue > utilityRate) {
+    if (this.state.bidValue <= buyBackRate || this.state.bidValue >= utilityRate) {
       // Log.
       console.log("Invalid bid.");
 
@@ -401,10 +406,13 @@ class AuctionForm extends Component {
       bids.set(this.state.accounts[0], bid);
 
       // Set state.
-      this.setState({
+      await this.setState({
         bidValue: "",
         bid
       });
+
+      // Identify if buyer or seller.
+      this.identify();
     }
   }
   // Submit bid quantity.
@@ -435,10 +443,13 @@ class AuctionForm extends Component {
       buyerQuants.set(this.state.accounts[0], bidQuantity);
 
       // Set state.
-      this.setState({
+      await this.setState({
         bidQuantityValue: "",
         bidQuantity
       });
+
+      // Identify if buyer or seller.
+      this.identify();
     }
   }
   // Submit sell quantity.
@@ -469,10 +480,13 @@ class AuctionForm extends Component {
       sellerQuants.set(this.state.accounts[0], sellQuantity);
 
       // Set state.
-      this.setState({
+      await this.setState({
         sellQuantityValue: "",
         sellQuantity
       });
+
+      // Identify if buyer or seller.
+      this.identify();
     }
   }
 
@@ -503,9 +517,6 @@ class AuctionForm extends Component {
       // Log.
       console.log("Auction initialized.")
 
-      // TODO: Start auction on the hour.
-      // Recalculate production, consumption, and storage capacity.
-
       // Timeout length.
       var t0 = new Date();
       var t1 = new Date(t0.getFullYear(), t0.getMonth(), t0.getDate(), t0.getHours() + 1, 0, 0, 0);
@@ -535,7 +546,17 @@ class AuctionForm extends Component {
       }
 
       // Set state.
-      this.setState({ isAuction: true });
+      await this.setState({
+        bidValue: "",
+        bid: "[No bid has been submitted.]",
+        bidQuantityValue: "",
+        bidQuantity: "[No bid quantity has been submitted.]",
+        sellQuantityValue: "",
+        sellQuantity: "[No sell quantity has been submitted.]",
+        isAuction: true,
+        isBuyer: true,
+        isSeller: true
+      });
     } catch (error) {
       // Throw error.
       alert(`Failed to initalize auction.`);
@@ -556,8 +577,6 @@ class AuctionForm extends Component {
       console.log(buyerQuants);
       console.log("Seller quantities: ");
       console.log(sellerQuants);
-
-      // TODO: End auction and display results. Pay if necessary.
 
       //////////////////////
       // Auction Results. //
@@ -645,8 +664,6 @@ class AuctionForm extends Component {
 
         // If bid quantity exceeds remaining supply.
         if (bq >= remaining) {
-          // Log.
-          console.log("Demand greater than supply for bidder: " + b);
 
           // Microgrid. //
 
@@ -680,8 +697,6 @@ class AuctionForm extends Component {
           // Set remaining supply to zero.
           remaining = 0;
         } else  {
-          // Log.
-          console.log("Demand greater than supply for bidder: " + b);
 
           // Microgrid. //
 
@@ -718,12 +733,38 @@ class AuctionForm extends Component {
       console.log("Seller payments: ");
       console.log(payments);
 
+      // Check buyer state.
+      if ((this.state.bid != "[No bid has been submitted.]") && (this.state.bidQuantity != "[No bid quantity has been submitted.]")) {
+        this.setState({ isBuyer: true });
+      } else {
+        this.setState({ isBuyer: false });
+      }
+      // Check seller state.
+      if (this.state.sellQuantity != "[No sell quantity has been submitted.]") {
+        this.setState({ isSeller: true });
+      } else {
+        this.setState({ isSeller: false });
+      }
+
+
       // Set state.
       this.setState({ isAuction: false });
     } catch (error) {
       // Throw error.
       alert(`Failed to finalize auction.`);
       console.error(error);
+    }
+  }
+
+  // Determine buyer or seller identity.
+  identify() {
+    // Check buyer state.
+    if ((this.state.bid != "[No bid has been submitted.]") && (this.state.bidQuantity != "[No bid quantity has been submitted.]")) {
+      this.setState({ isSeller: false });
+    }
+    // Check seller state.
+    if (this.state.sellQuantity != "[No sell quantity has been submitted.]") {
+      this.setState({ isBuyer: false });
     }
   }
 
@@ -751,6 +792,24 @@ class AuctionForm extends Component {
 
           <p>The auction period ends in {this.state.next} minute(s).</p>
 
+          {this.state.isAuction ? (
+
+            <div>
+
+              <button onClick={() => {this.finalize()}}>Display Results Now</button>
+
+            </div>
+
+          ) : (
+
+            <div>
+
+              <button onClick={() => {this.initialize()}}>Start Another Auction</button>
+
+            </div>
+
+          )}
+
           <h3>Buy Electricity</h3>
 
           {this.state.isConsumer ? (
@@ -763,41 +822,73 @@ class AuctionForm extends Component {
 
                 <div>
 
-                  <p>You have {parseFloat(storageCapacity) - parseFloat(this.state.batt) - parseFloat(this.state.netmeter)} kWh of available capacity.</p>
+                {this.state.isBuyer ? (
 
-                  <p>Input bid value (¢/kWh).</p>
+                  <div>
 
-                    <form onSubmit={this.handleBidSubmit}>
+                    <p>You have {parseFloat(parseFloat(storageCapacity) - parseFloat(this.state.batt) - parseFloat(this.state.netmeter)).toFixed(2)} kWh of available capacity.</p>
+
+                    <p>Input bid value (¢/kWh).</p>
+
+                      <form onSubmit={this.handleBidSubmit}>
+                        <label>
+                          <input type="text" value={this.state.bidValue} onChange={this.handleBidChange} />
+                        </label>
+                        <input type="submit" value="Submit" />
+                        <div>
+                          <p>Bid value: {this.state.bid}</p>
+                        </div>
+                      </form>
+
+                    <p>Input bid quantity (kWh).</p>
+
+                    <form onSubmit={this.handleBidQuantitySubmit}>
                       <label>
-                        <input type="text" value={this.state.bidValue} onChange={this.handleBidChange} />
+                        <input type="text" value={this.state.bidQuantityValue} onChange={this.handleBidQuantityChange} />
                       </label>
                       <input type="submit" value="Submit" />
                       <div>
-                        <p>Bid value: {this.state.bid}</p>
+                        <p>Bid quantity: {this.state.bidQuantity}</p>
                       </div>
                     </form>
 
-                  <p>Input bid quantity (kWh).</p>
+                </div>
 
-                  <form onSubmit={this.handleBidQuantitySubmit}>
-                    <label>
-                      <input type="text" value={this.state.bidQuantityValue} onChange={this.handleBidQuantityChange} />
-                    </label>
-                    <input type="submit" value="Submit" />
-                    <div>
-                      <p>Bid quantity: {this.state.bidQuantity}</p>
-                    </div>
-                  </form>
+                ) : (
 
-              </div>
+                  <div>
+
+                    <p>You can not bid on electricity in the current auction.</p>
+
+                  </div>
+
+                )}
+
+                </div>
 
             ) : (
 
-              <div>
+            <div>
 
-                <p>You paid {prices.get(this.state.accounts[0])} cents for {buyerQuants.get(this.state.accounts[0])} kWh of electricity.</p>
+              {this.state.isBuyer ? (
 
-              </div>
+                <div>
+
+                  <p>You paid {parseFloat(prices.get(this.state.accounts[0])).toFixed(2)} cents for {parseFloat(buyerQuants.get(this.state.accounts[0])).toFixed(2)} kWh of electricity.</p>
+
+                </div>
+
+              ) : (
+
+                <div>
+
+                  <p>You did not bid on electricity in the current auction.</p>
+
+                </div>
+
+              )}
+
+            </div>
 
             )}
 
@@ -825,33 +916,62 @@ class AuctionForm extends Component {
 
                 <div>
 
-                  <p>You have {parseFloat(this.state.netmeter) + parseFloat(this.state.batt)} kWh of available electricity.</p>
+                {this.state.isSeller ? (
 
-                  <p>Input sell quantity (kWh).</p>
+                  <div>
 
-                  <form onSubmit={this.handleSellQuantitySubmit}>
-                    <label>
-                      <input type="text" value={this.state.sellQuantityValue} onChange={this.handleSellQuantityChange} />
-                    </label>
-                    <input type="submit" value="Submit" />
-                    <div>
-                      <p>Sell quantity: {this.state.sellQuantity}</p>
-                    </div>
-                  </form>
+                    <p>You have {parseFloat(parseFloat(this.state.netmeter) + parseFloat(this.state.batt)).toFixed(2)} kWh of available electricity.</p>
 
-                  <p>To view the results of the auction, click the button below.</p>
+                    <p>Input sell quantity (kWh).</p>
 
-                  <button onClick={() => {this.finalize()}}>Display Results</button>
+                    <form onSubmit={this.handleSellQuantitySubmit}>
+                      <label>
+                        <input type="text" value={this.state.sellQuantityValue} onChange={this.handleSellQuantityChange} />
+                      </label>
+                      <input type="submit" value="Submit" />
+                      <div>
+                        <p>Sell quantity: {this.state.sellQuantity}</p>
+                      </div>
+                    </form>
+
+                  </div>
+
+                ) : (
+
+                  <div>
+
+                    <p>You can not sell electricity in the current auction.</p>
+
+                  </div>
+
+                )}
 
                 </div>
+
 
               ) : (
 
-                <div>
+              <div>
 
-                  <p>You earned {payments.get(this.state.accounts[0])} cents for {sellerQuants.get(this.state.accounts[0])} kWh of electricity.</p>
+                {this.state.isSeller ? (
 
-                </div>
+                  <div>
+
+                    <p>You earned {parseFloat(payments.get(this.state.accounts[0])).toFixed(2)} cents for {parseFloat(sellerQuants.get(this.state.accounts[0])).toFixed(2)} kWh of electricity.</p>
+
+                  </div>
+
+                ) : (
+
+                  <div>
+
+                    <p>You did not sell electricity in the current auction.</p>
+
+                  </div>
+
+                )}
+
+              </div>
 
               )}
 
