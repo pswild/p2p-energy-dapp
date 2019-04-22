@@ -76,8 +76,8 @@ for (const address of addresses) {
 const storageCapacity = 13.5;
 
 // Utility rates: $/kWh.
-const buyBackRate = 3;
-const utilityRate = 12;
+const buyBackRate = 3.0;
+const utilityRate = 12.0;
 
 ///////////////////
 // Auction form. //
@@ -534,113 +534,160 @@ class AuctionForm extends Component {
 
       // TODO: End auction and display results. Pay if necessary.
 
-      // bids
-      // buyerQuants
-      // sellerQuants
-      // prices
-      // payments
-      // storage
+      //////////////////////
+      // Auction Results. //
+      //////////////////////
 
+      // Sellers. //
 
-      var aggregateForSale = 0.0;
+      // Aggregate seller supply.
+      var supply = 0.0;
+      // List of sellers.
+      var sellers = [];
+      // Find sellers.
       for (const address of addresses) {
-        var sellQuant = sellerQuants.get(address);
-        if (sellQuant != "[No sell quantity has been submitted.]") {
-          aggregateForSale += parseFloat(sellQuant);
+        var quantity = sellerQuants.get(address);
+        if (quantity != "[No sell quantity has been submitted.]") {
+          // Add seller.
+          sellers.push(address);
+          // Update supply.
+          supply += parseFloat(quantity);
         }
       }
+      // Remaining supply.
+      var remaining = supply;
 
-      var total_supply_left = aggregateForSale;
+      // Buyers. //
 
-      // var newBids = new Map(bids);
+      // TODO: duplicate list to delete bids.
 
-      var ordered = [];
-      var pastBid = 1000;
+      // List of bidders.
+      var bidders = [];
+      // Previous highest bid.
+      var pastBid = Infinity;
+      // Address of previous highest bidder.
       var pastAddr = null;
+      // Address of current highest bidder.
       var currentAddr = null;
-
-      var j = 0;
-      for (var i = 0; i < 10; i++) {
-        var currentBid = 0;
+      // Bidder index.
+      var index = 0;
+      // Order bidders by descending bid value.
+      for (var i = 0; i < addresses.length; i++) {
+        // Current highest bid bid.
+        var currentBid = 0.0;
+        // Find next highest bidder.
         for (const address of addresses) {
+          // Bid.
           var tempBid = bids.get(address);
+          // If bid submitted.
           if (tempBid != "[No bid has been submitted.]") {
+            // If higher than current highest bid and lower than previous
+            // highest bid, update current highest bid.
             if ((parseFloat(tempBid) > parseFloat(currentBid)) && (parseFloat(tempBid) < parseFloat(pastBid))) {
               currentBid = tempBid;
               currentAddr = address;
             }
           }
         }
+        // TODO: Ensure no duplicates.
         if (currentAddr != pastAddr) {
-          ordered[j] = currentAddr;
+          // Add next highest bidder.
+          bidders[index] = currentAddr;
+          index++;
+          // Update previous bid and bidder.
           pastBid = currentBid;
           pastAddr = currentAddr;
-          j++;
         }
       }
 
-      console.log("Ordered: ");
-      console.log(ordered);
+      // Prices and payments. //
 
-      // list of sellers
-      var sellers = [];
-      for (const address of addresses) {
-        var sellQuant = sellerQuants.get(address);
-        if (sellQuant != "[No sell quantity has been submitted.]") {
-          sellers.push(address)
+      // Bidder index.
+      var index = 0;
+      // Iterate over bidders while supply remains.
+      while(remaining > 0) {
+
+        // Current bidder. //
+
+        // Bidder address.
+        var b = bidders[index];
+        // Bidder bid value.
+        var v = parseFloat(bids.get(b));
+        // Bidder bid quantity.
+        var bq = parseFloat(buyerQuants.get(b));
+
+        // Determine rates. //
+
+        // If bid quantity exceeds remaining supply.
+        if (bq >= remaining) {
+          // Log.
+          console.log("Demand greater than supply for bidder: " + b);
+
+          // Microgrid. //
+
+          // Update bidder price.
+          prices.set(b, ((remaining) * v) + ((bq - remaining) * utilityRate));
+
+          // Update sellers' payments.
+          for (var i = 0; i < sellers.length; i++) {
+            // Seller address.
+            var s = sellers[i];
+            // Seller quantity.
+            var sq = parseFloat(sellerQuants.get(s));
+            // Previous seller payment.
+            var p = parseFloat(payments.get(s));
+            // Issue payment proportional to percentage of supply.
+            payments.set(s, p + (v * (sq / supply)));
+          }
+
+          // Utility grid. //
+
+          // Each of the remaining bidders pay full utility price.
+          for (var j = index + 1; j < bidders.length; j++) {
+            // Bidder address.
+            var o = bidders[j];
+            // Bidder bid quantity.
+            var oq = parseFloat(buyerQuants.get(o));
+            // Update bidder price.
+            prices.set(o, (oq * utilityRate));
+          }
+
+          // Set remaining supply to zero.
+          remaining = 0;
+        } else  {
+          // Log.
+          console.log("Demand greater than supply for bidder: " + b);
+
+          // Microgrid. //
+
+          // Update bidder price.
+          prices.set(b, (bq * v));
+
+          // Update sellers' payments.
+          for (var k = 0; k < sellers.length; k++) {
+            // Seller address.
+            var s = sellers[k];
+            // Seller quantity.
+            var sq = parseFloat(sellerQuants.get(s));
+            // Previous seller payment.
+            var p = parseFloat(payments.get(s));
+            // Issue payment proportional to percentage of supply.
+            payments.set(s, p + (v * (sq / supply)));
+          }
+
+          // Update remaining supply.
+          remaining -= bq;
         }
-      }
 
-      console.log("Sellers: ");
-      console.log(sellers);
-
-      var i = 0;
-      while(total_supply_left > 0) {
-        console.log("here");
-          var currentBidder = ordered[i];
-
-          if (buyerQuants.get(currentBidder) >= total_supply_left) {
-
-            console.log("demand greater than supply")
-            console.log("currentBidder " + currentBidder);
-
-            // update last winner's price
-            prices.set(currentBidder,
-              (parseFloat(total_supply_left) * parseFloat(bids.get(currentBidder))) +
-              (parseFloat(buyerQuants.get(currentBidder)) - parseFloat(total_supply_left))*parseFloat(utilityRate));
-
-            //update sellers payments
-            for (var k = 0; k < sellers.length; k++) {
-              payments.set(sellers[k], parseFloat(payments.get(sellers[k])) + parseFloat(bids.get(currentBidder))*parseFloat((sellerQuants.get(sellers[k]))/parseFloat(aggregateForSale)));
-            }
-
-            // Each of the remaining losers of the auction pay full utility price for the quant they requested
-            for (var j = i + 1; j < ordered.length; j++) {
-              prices.set(currentBidder, parseFloat(buyerQuants.get(currentBidder)) * parseFloat(utilityRate));
-            }
-
-            total_supply_left = 0;
-            continue;
-          }
-          else  {
-
-            console.log("demand less than than supply")
-            console.log("currentBidder " + currentBidder);
-
-            // update price that one of the "winners" made
-            prices.set(currentBidder, (parseFloat(buyerQuants.get(currentBidder)) * parseFloat(bids.get(currentBidder))));
-
-            // update sellers payments
-            for (var k = 0; k < sellers.length; k++) {
-              payments.set(sellers[k], parseFloat(payments.get(sellers[k])) + parseFloat(bids.get(currentBidder))*parseFloat((sellerQuants.get(sellers[k]))/parseFloat(aggregateForSale)));
-            }
-            total_supply_left = total_supply_left - parseFloat(buyerQuants.get(currentBidder));
-          }
-
-          i++;
+        // Update bidder index.
+        index++;
       }
 
       // Log.
+      console.log("Buyers: ");
+      console.log(bidders);
+      console.log("Sellers: ");
+      console.log(sellers);
       console.log("Buyer prices: ");
       console.log(prices);
       console.log("Seller payments: ");
