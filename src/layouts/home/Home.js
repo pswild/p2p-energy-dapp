@@ -24,13 +24,13 @@ class Home extends Component {
 
             <h1>Welcome to the Future of Energy!</h1>
 
-              <p>A peer-to-peer energy trading platform for community micro-grids. For more on the project, visit our <a href="https://github.com/pswild/p2p-energy-dapp" target="_blank">GitHub</a>.</p>
+              <p>We are a peer-to-peer energy trading platform for community micro-grids. For more on the project, visit our <a href="https://github.com/pswild/p2p-energy-dapp" target="_blank">GitHub</a>.</p>
 
               <p><strong><i>Thank you for joining us!</i></strong></p>
 
             <h3>Getting Started</h3>
 
-              <p>Set up your secure account with <a href="https://www.uport.me" target="_blank">uPort</a> authentication on your mobile device and then log in!</p>
+              <p>You'll need a <a href="https://www.coinbase.com/" target="_blank">Coinbase</a> account to buy Ethereum, the <a href="https://metamask.io/" target="_blank">MetaMask</a> browser extension, and the <a href="https://www.uport.me" target="_blank">uPort</a> mobile app.</p>
 
               <img
                 src={ image }
