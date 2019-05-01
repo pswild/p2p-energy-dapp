@@ -32,10 +32,10 @@ class Home extends Component {
 
               <p>Set up your secure account with <a href="https://www.uport.me" target="_blank">uPort</a> authentication on your mobile device and then log in!</p>
 
-            <img
-              src={ image }
-              style={{ height: 480, width: 960 }}
-            />
+              <img
+                src={ image }
+                style={{ height: 480, width: 960 }}
+              />
 
           </div>
         </div>
