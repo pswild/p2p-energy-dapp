@@ -18,16 +18,16 @@ import AuctionContract from '../../../build/contracts/Auction.json'
 
 // Ethereum addresses hosted on Ganache.
 const addresses = [
-  "0x8E2077Ab0E6D14AF306106303d879d8b4F580e3f",
-  "0x301D2749B559BC9933b7bA85E5151f2b075DA5eB",
-  "0x4cE4f8F59B69474860d533191685edA6afA83B89",
-  "0x9956168BfD29AE6cadcDbe0A820b069f06Af5F7f",
-  "0xD73c86f2B6cbb14c01F4C634B461D20aa86BD7e1",
-  "0x3D43D1c22Ddd267AC0cE677AcA7c96f31b547234",
-  "0x42C8E0299Fd33b57Fa10628228bDfE1c6f013868",
-  "0x8328Bff14018a2Bd2498B5A04158ADb726185D60",
-  "0xfD2a5AFEE3A3c8C892Fed5A0CCfE705Fd06c6663",
-  "0x4917B088806dA204F406127520Cf06F8E82e17B9"
+  "0xa35702EEfc4c773c47d970ac1374F70cb0dc9a63",
+  "0xE330Af6427e19A4A3b25E09d2C00D022F0E41267",
+  "0x044A69fec4536394459c9a3152F9827cbF8C90F2",
+  "0x78eD9a3b73E308056a292C3D3438c772dA3aD7F4",
+  "0xd78d1a1AA6297419Dd2e9C6B1caF4B8d4Be5Dd3D",
+  "0x91F3a1C6F43e58D59c9972C9822014068D8A4ab6",
+  "0xD6A41fd0D2f32F5DcDEF90f7e394c2AfB3e51011",
+  "0x61F12096D06e6A0a3a647B887B68f13D5b83B839",
+  "0x136b4F0630780B1e708B3b7D5B3d092Bea1C2E64",
+  "0xc2C3bbd9BD9549Dc2917EdAF31E41F81eabcAC61"
 ];
 
 // Map Ethereum addresses to account information.
@@ -55,6 +55,8 @@ var sellerQuants = new Map();
 // Bidder prices and seller payments.
 var prices = new Map();
 var payments = new Map();
+// Seller quantities sold.
+var sold = new Map();
 // Battery level.
 var storage = new Map();
 
@@ -63,8 +65,9 @@ for (const address of addresses) {
   bids.set(address, "[No bid has been submitted.]");
   buyerQuants.set(address, "[No bid quantity has been submitted.]");
   sellerQuants.set(address, "[No sell quantity has been submitted.]");
-  prices.set(address, 0);
-  payments.set(address, 0);
+  prices.set(address, 0.0);
+  payments.set(address, 0.0);
+  sold.set(address, 0.0);
   storage.set(address, 0.0);
 }
 
@@ -551,8 +554,9 @@ class AuctionForm extends Component {
         bids.set(address, "[No bid has been submitted.]");
         buyerQuants.set(address, "[No bid quantity has been submitted.]");
         sellerQuants.set(address, "[No sell quantity has been submitted.]");
-        prices.set(address, 0);
-        payments.set(address, 0);
+        prices.set(address, 0.0);
+        payments.set(address, 0.0);
+        sold.set(address, 0.0);
       }
 
       // Set state.
@@ -665,6 +669,24 @@ class AuctionForm extends Component {
 
         // Bidder address.
         var b = bidders[index];
+        // If supply exceeds demand, sell remaining supply to the utility.
+        if (b == null) {
+          // Update sellers' payments.
+          for (var i = 0; i < sellers.length; i++) {
+            // Seller address.
+            var s = sellers[i];
+            // Seller quantity.
+            var sq = parseFloat(sellerQuants.get(s));
+            // Previous seller payment.
+            var p = parseFloat(payments.get(s));
+            // Total seller quantity sold.
+            var ss = parseFloat(sold.get(s));
+            // Issue payment proportional to percentage of supply.
+            payments.set(s, p + (buyBackRate * (remaining * (sq / supply))));
+          }
+          // Break.
+          break;
+        }
         // Bidder bid value.
         var v = parseFloat(bids.get(b));
         // Bidder bid quantity.
@@ -680,7 +702,7 @@ class AuctionForm extends Component {
           // Update bidder price.
           prices.set(b, ((remaining) * v) + ((bq - remaining) * utilityRate));
 
-          // Update sellers' payments.
+          // Update sellers' payments and quantities sold.
           for (var i = 0; i < sellers.length; i++) {
             // Seller address.
             var s = sellers[i];
@@ -689,7 +711,11 @@ class AuctionForm extends Component {
             // Previous seller payment.
             var p = parseFloat(payments.get(s));
             // Issue payment proportional to percentage of supply.
-            payments.set(s, p + (v * (sq * (sq / supply))));
+            payments.set(s, p + (v * (remaining * (sq / supply))));
+            // Previous seller quantity sold.
+            var ss = parseFloat(sold.get(s));
+            // Update seller quantity sold.
+            sold.set(s, ss + (remaining * (sq / supply)));
           }
 
           // Utility grid. //
@@ -713,7 +739,7 @@ class AuctionForm extends Component {
           // Update bidder price.
           prices.set(b, (bq * v));
 
-          // Update sellers' payments.
+          // Update sellers' payments and quantities sold.
           for (var k = 0; k < sellers.length; k++) {
             // Seller address.
             var s = sellers[k];
@@ -722,7 +748,11 @@ class AuctionForm extends Component {
             // Previous seller payment.
             var p = parseFloat(payments.get(s));
             // Issue payment proportional to percentage of supply.
-            payments.set(s, p + (v * (sq / supply)));
+            payments.set(s, p + (v * (bq * (sq / supply))));
+            // Previous seller quantity sold.
+            var ss = parseFloat(sold.get(s));
+            // Update seller quantity sold.
+            sold.set(s, ss + (bq * (sq / supply)));
           }
 
           // Update remaining supply.
