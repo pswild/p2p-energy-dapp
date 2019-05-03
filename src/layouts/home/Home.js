@@ -11,11 +11,6 @@ class Home extends Component {
     this.state = {};
   }
 
-  async componentDidMount() {
-    // Log.
-    // console.log("Home component mounted.");
-  }
-
   render() {
     return(
       <main className="container">

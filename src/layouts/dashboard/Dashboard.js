@@ -34,9 +34,6 @@ class Dashboard extends Component {
 
   // Load Web3.
   async componentDidMount() {
-    // Log.
-    // console.log("Dashboard component mounted.");
-
     // Register mounted.
     this.mounted = true;
 

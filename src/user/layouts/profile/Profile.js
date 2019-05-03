@@ -35,10 +35,7 @@ class Profile extends Component {
   }
 
   // Load Web3.
-  async componentDidMount() {
-    // Log.
-    // console.log("Profile component mounted.");
-    
+  async componentDidMount() {    
     // Register mounted.
     this.mounted = true;
 
