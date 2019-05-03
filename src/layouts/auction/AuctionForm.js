@@ -1043,7 +1043,7 @@ class AuctionForm extends Component {
           </p>
 
           <h2>Statistics</h2>
-          <p>See data from the last auction period here.</p>
+          <p>See data from the current auction period here.</p>
           <p>
             <strong><i>Electricity Consumption</i></strong><br />
             {this.state.consumption} kilowatt-hours<br />
